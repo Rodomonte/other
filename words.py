@@ -3,7 +3,7 @@
 d,p = [],[]
 f = open('dict.txt', 'r')
 for line in f:
-  d += [line[:-2]]
+  d += [line[:-1]]
 lc = ''
 
 while True:
