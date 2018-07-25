@@ -5,19 +5,19 @@
 
 #include "macro.h"
 
-enum GameType {
+enum Format {
   EDH
 , MODERN
 };
 
-const string ART = "Artifact"
-           , BAS = "Basic"
-           , CRE = "Creature"
-           , ENC = "Enchantment"
-           , INS = "Instant"
-           , LAN = "Land"
-           , LEG = "Legendary"
-           , PLA = "Planeswalker"
-           , SOR = "Sorcery";
+const str ART = "Artifact"
+        , BAS = "Basic"
+        , CRE = "Creature"
+        , ENC = "Enchantment"
+        , INS = "Instant"
+        , LAN = "Land"
+        , LEG = "Legendary"
+        , PLA = "Planeswalker"
+        , SOR = "Sorcery";
 
 #endif

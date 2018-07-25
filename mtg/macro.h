@@ -5,9 +5,10 @@
 
 #include "incl.h"
 
+#define str string
 #define vec vector
-#define vi vector<int>
-#define vs vector<string>
+#define vi vec<int>
+#define vs vec<str>
 #define pb push_back
 
 #endif

@@ -1,8 +1,12 @@
 // QUAL
 
-#idndef qual_h
+#ifndef qual_h
 #define qual_h
 
+#include "util.h"
 
+struct Qual {
+
+};
 
 #endif

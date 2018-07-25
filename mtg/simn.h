@@ -5,6 +5,11 @@
 
 #include "sim.h"
 
+struct Simn {
+  int run(){
 
+    return 0;
+  }
+};
 
 #endif

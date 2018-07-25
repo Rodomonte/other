@@ -5,7 +5,7 @@
 
 #include "const.h"
 
-bool in(string& s, vs v){
+bool in(str s, vs& v){
   int i;
   for(i = 0; i < v.size(); ++i)
     if(v[i] == s) return true;

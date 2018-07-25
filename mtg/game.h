@@ -7,11 +7,13 @@
 
 struct Game {
   int       n;
-  GameType  type;
+  Format    format;
   vec<int>  life, poison;
+  vec<Bot>  bots;
   vec<Deck> decks;
 
-  Game(GameType _type, vec<Deck> _decks): decks(_decks) {
+  Game(){}
+  Game(Format _format, vec<Deck> _decks): format(_format), decks(_decks) {
     int i;
     n = decks.size();
     for(i = 0; i < n; ++i)
