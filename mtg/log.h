@@ -3,23 +3,30 @@
 #ifndef log_h
 #define log_h
 
-#include "game.h"
+//#include "_.h"
+
 
 struct Log {
-  vec<Game> g;
+  ll begin;
+  str fname;
 
   Log(){}
-  Log(Game& _g): g({_g}) {}
+
+int init(){
+
+  return 2;
+}
+
+int wr_game(){
+
+  return 2;
+}
 
   void save(){
-    //! Pickle
+    //! json?
 
-  }
-
-  int run(){
-
-    return 2;
   }
 };
+
 
 #endif

@@ -3,7 +3,8 @@
 #ifndef create_h
 #define create_h
 
-#include "deck.h"
+#include "util.h"
+
 
 int create_card(){
 
@@ -14,5 +15,6 @@ int create_deck(){
 
   return 2;
 }
+
 
 #endif

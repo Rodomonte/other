@@ -3,19 +3,21 @@
 #ifndef card_h
 #define card_h
 
-#include "qual.h"
+#include "util.h"
+
 
 struct Card {
-  int       mwhi, mblu, mblk, mred, mgre, mcol, mgen, pow, tuf, tpow, ttuf;
-  str       name;
-  vs        types, quals;
-  vec<Qual> q;
+  int            mw, mu, mb, mr, mg, mc, mg, pow, tuf, tpow, ttuf;
+  str            name;
+  vs             types;
+  uset<str>      quals;
+  umap<str, int> counters;
 
-  Card(str _name, int _mwhi, int _mblu, int _mblk, int _mred, int _mgre
-     , int _mcol, int _mgen, int _pow, int _tuf, vs _types, vs _quals):
-    name(name), mwhi(_mwhi), mblu(_mblu), mblk(_mblk), mred(_mred)
-  , mgre(_mgre), mcol(_mcol), mgen(_mgen), pow(_pow), tuf(_tuf), tpow(_pow)
-  , ttuf(_tuf), types(_types), quals(_quals) {}
+  Card(str _name, int _mw, int _mu, int _mb, int _mr, int _mg, int _mcol
+     , int _mg, int _pow, int _tuf, vs _types, vs _quals):
+    name(name), mw(_mw), mu(_mu), mb(_mb), mr(_mr), mg(_mg), mc(_mc), mg(_mg)
+  , pow(_pow), tuf(_tuf), tpow(_pow), ttuf(_tuf), types(_types), quals(_quals)
+  {}
 
   int cmc(){ return mwhi + mblu + mblk + mred + mgre + mcol + mgen; }
 
@@ -24,5 +26,6 @@ struct Card {
   }
   bool is_nlperm(){ return is_perm() && !in(LAN, types); }
 };
+
 
 #endif

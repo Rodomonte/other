@@ -3,7 +3,8 @@
 #ifndef view_h
 #define view_h
 
-#include "deck.h"
+#include "util.h"
+
 
 int view_lib(){
 
@@ -14,5 +15,6 @@ int view_decks(){
 
   return 2;
 }
+
 
 #endif
