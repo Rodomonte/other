@@ -6,14 +6,17 @@
 #include "util.h"
 
 
-int view_lib(){
+int view_lib(vc& lib){
+  check(parse());
+    printf("Loading card library..\n");
+  // if lib.map DNE, run parse
 
-  return 2;
+  return 0;
 }
 
-int view_decks(){
+int view_decks(vd& decks){
 
-  return 2;
+  return 0;
 }
 
 

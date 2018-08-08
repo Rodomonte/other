@@ -10,15 +10,15 @@ struct Deck {
   int       id;
   Format    format;
   str       name;
-  vec<Card> main, side, extra;
+  vc main, side, extra;
 
   Deck(int _id, Format _format): id(_id), format(_format) {}
-  Deck(vec<Card> _main, vec<Card> _side, vec<Card> _extra):
+  Deck(vc _main, vc _side, vc _extra):
     main(_main), side(_side), extra(_extra) {}
 
   str file(){ return str(sprintf("%s/d%4d.deck", DECK_DIRS[format], id)); }
 
-  void from_str(str s){
+  void from_str(str& s){
 
   }
 

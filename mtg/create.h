@@ -8,12 +8,12 @@
 
 int create_card(){
 
-  return 2;
+  return 0;
 }
 
-int create_deck(){
+int create_deck(vc& lib){
 
-  return 2;
+  return 0;
 }
 
 

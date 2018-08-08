@@ -12,12 +12,12 @@ struct Game : Obj {
   Format                format;
   vec<int>              life;
   vec<Bot>              bot;
-  vec<Deck>             deck;
+  vd             deck;
   vec<umap<str, int> >  counters;
   vec<umap<str, Card> > hand, field, grave, exile;
 
   Game(){}
-  Game(Format _format, vec<Bot>& _bots, vec<Deck>& _decks):
+  Game(Format _format, vec<Bot>& _bots, vd& _decks):
       format(_format), bots(_bots), decks(_decks) {}
 
   str to_str(){
@@ -42,12 +42,12 @@ struct Game : Obj {
     return n >= np-1;
   }
 
-  int draw(vec<Deck>& d, umap<str, Card> m, int n){
+  int draw(vd& d, umap<str, Card> m, int n){
     int i;
     for(i = 0; i < n; ++i){
       if(!d.empty())
     }
-    return 2;
+    return 0;
   }
 
   int init(){
@@ -62,13 +62,13 @@ struct Game : Obj {
     for(i = 0; i < np; ++i)
       check(draw(deck[i], hand[i], 7));
 
-    return 2;
+    return 0;
   }
 
   int step(){
 
     //! write file
-    return 2;
+    return 0;
   }
 
   int run(){
@@ -78,7 +78,7 @@ struct Game : Obj {
       check(log(to_str()));
       if(done()) break;
     }
-    return 2;
+    return 0;
   }
 };
 

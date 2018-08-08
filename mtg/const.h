@@ -3,14 +3,15 @@
 #ifndef const_h
 #define const_h
 
-#include "def.h"
+#include "obj.h"
 
 
 const str
   BOTS_DIR  = "obj/bots"
-, CARDS_DIR = "obj/lib"
+, LIB_DIR   = "obj/lib"
 , DECKS_DIR = "obj/decks"
 
+, LIB_JSON  = LIB_DIR.join("lib.json")
 
 , MAIN_OPS =
     "(0) Exit\n"
@@ -20,8 +21,7 @@ const str
     "(4) Create Card\n"
     "(5) Create Deck\n"
     "(6) Play Game\n"
-    "(7) Sim Game\n"
-    "(8) Sim Games\n"
+    "(7) Sim Games\n"
     "  > "
 
 , SIM_OPS =
@@ -29,7 +29,6 @@ const str
     "(1)   Back\n"
     "(2)   Ready\n"
     "(3 #) View\n"
-
 
 , GEN_HEADER =
     "/*********************************************************/"
@@ -42,23 +41,23 @@ const str
 ;
 
 
-enum Format { EDH, STA, MOD, DRA, SEA, THG };
+enum Format { EDH, DRA, MOD, SEA, STA, THG };
 map<Format, str>
   FORMATS
-{ {EDH, "Commander"}
-, {STA, "Standard"}
+{ {DRA, "Draft"}
+, {EDH, "Commander"}
 , {MOD, "Modern"}
-, {DRA, "Draft"}
 , {SEA, "Sealed"}
+, {STA, "Standard"}
 , {THG, "Two-Headed Giant"}
 }
 
 , DECK_DIRS
-{ {EDH, DECKS_DIR+"/edh"}
-, {STA, DECKS_DIR+"/sta"}
+{ {DRA, DECKS_DIR+"/lim"}
+, {EDH, DECKS_DIR+"/edh"}
 , {MOD, DECKS_DIR+"/mod"}
-, {DRA, DECKS_DIR+"/dra"}
-, {SEA, DECKS_DIR+"/sea"}
+, {SEA, DECKS_DIR+"/lim"}
+, {STA, DECKS_DIR+"/sta"}
 , {THG, DECKS_DIR+"/thg"}
 };
 

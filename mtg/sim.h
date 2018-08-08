@@ -11,11 +11,11 @@ struct Sim {
 
   Sim(){}
 
-  int get_decks(Format format, vec<Deck>& r){
+  int pick_decks(Format format, vd& r){
     int i, n, nd, np, op;
     FILE* fp;
     str s;
-    vec<Deck> decks;
+    vd decks;
 
     fp = fopen(sprintf("%s/n.txt", DECK_DIRS[format]), "r");
     fscanf(fp, "%d", &nd);
@@ -62,10 +62,10 @@ struct Sim {
 
       }else r.pb(decks[n]);
     }
-    return 2;
+    return 0;
   }
 
-  int get_bots(vec<Bot>& r){
+  int pick_bots(vec<Bot>& r){
 
   }
 
@@ -73,7 +73,7 @@ struct Sim {
     int opt;
     Format format;
     vec<Bot> bots;
-    vec<Deck> decks;
+    vd decks;
 
     opt = -1;
     while(opt < 0 || opt > 3){
@@ -87,16 +87,21 @@ struct Sim {
 
     check(opt);
     format = (opt == 2) ? EDH : MODERN;
-    check(get_decks(format, decks));
-    check(get_bots(bots));
+    check(pick_decks(format, decks));
+    check(pick_bots(bots));
     game = Game(format, bots, decks);
-    return 2;
+    return 0;
   }
 
-  int run(int human){
+  int play(vd& decks){
     check(init());
     check(game.run());
-    return 2;
+    return 0;
+  }
+
+  int sim(vd& decks){
+
+    return 0;
   }
 };
 

@@ -12,19 +12,19 @@ struct Log {
 
   Log(){}
 
-int init(){
+  int init(){
 
-  return 2;
-}
+    return 0;
+  }
 
-int wr_game(){
+  int wr_game(){
 
-  return 2;
-}
+    return 0;
+  }
 
-  void save(){
-    //! json?
+  int save(){
 
+    return 0;
   }
 };
 
