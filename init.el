@@ -3,7 +3,7 @@
 (provide '.emacs)
 
 ;; Constants
-(setq path "c:/Users/rodomonte/AppData/Roaming/.emacs.d/init.el")
+(setq path "~/.emacs.d/init.el")
 (setq winh 46)
 
 ;; Frame
@@ -37,8 +37,8 @@
 (global-set-key [?\C-\S-i] 'delete-window)
 
 ;; Buffer
-(global-set-key [?\C-\S-u] 'previous-buffer)
-(global-set-key [?\C-\S-o] 'next-buffer)
+(global-set-key [?\C-\S-a] 'previous-buffer)
+(global-set-key [?\C-\S-d] 'next-buffer)
 
 ;; Text
 (set-foreground-color "#ffffff")
