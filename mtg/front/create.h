@@ -11,7 +11,7 @@ int create_card(){
   return 0;
 }
 
-int create_deck(vc& lib){
+int create_deck(vec<Card>& lib){
 
   return 0;
 }
