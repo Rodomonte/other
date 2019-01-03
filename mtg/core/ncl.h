@@ -1,7 +1,7 @@
-// INCL
+// NCL
 
-#ifndef incl_h
-#define incl_h
+#ifndef ncl_h
+#define ncl_h
 
 #include <stdio.h>
 #include <stdlib.h>

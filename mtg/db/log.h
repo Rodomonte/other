@@ -12,16 +12,6 @@ struct Log {
 
   Log(){}
 
-  int init(){
-
-    return 0;
-  }
-
-  int wr_game(){
-
-    return 0;
-  }
-
   int save(){
 
     return 0;

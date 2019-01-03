@@ -1,7 +1,7 @@
-// GLOBAL
+// GLB
 
-#ifndef global_h
-#define global_h
+#ifndef glb_h
+#define glb_h
 
 #include "def.h"
 

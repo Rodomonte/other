@@ -73,6 +73,6 @@ for k, v in c.items():
 */
 
 
-int parse(vc& lib){
+int parse(vec<Card>& lib){
 
 }

@@ -7,12 +7,12 @@
 #include "log.h"
 
 
-struct Game : Obj {
+struct Game {
   int                   id, np, cp, turn;
   Format                format;
   vec<int>              life;
   vec<Bot>              bot;
-  vd             deck;
+  vec<Deck>             deck;
   vec<umap<str, int> >  counters;
   vec<umap<str, Card> > hand, field, grave, exile;
 
