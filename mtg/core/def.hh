@@ -12,7 +12,6 @@
 #define pb   push_back
 
 #define uset unordered_set
-#define us   uset<str>
 #define umap unordered_map
 
 
