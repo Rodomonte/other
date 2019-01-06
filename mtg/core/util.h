@@ -6,9 +6,15 @@
 #include "const.h"
 
 
+// Globals
+
+char buf[1048576]
+   , err[2048];
+
+
 #define kill() quit(__FILE__, __FUNCTION__);
 
-#define check(r) if(r == 0) {} \
+#define check(r) if(r == PASS) {} \
             else if(r == 2) break; \
             else if(r == 3) continue; \
             else            kill();

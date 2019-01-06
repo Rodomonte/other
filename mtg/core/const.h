@@ -3,7 +3,7 @@
 #ifndef const_h
 #define const_h
 
-#include "obj.h"
+#include "def.h"
 
 
 const str

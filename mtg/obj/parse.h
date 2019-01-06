@@ -3,16 +3,19 @@
 #ifndef parse_h
 #define parse_h
 
+#include "../core/glb.h"
+
+
 const char* lpath = 'lib/lib.json';
 
 // Methods return sts(_), kills if internal check() fails
 
 struct sts {
   enum {
-    GOOD
-  , BAD
-  //!
-
+    PASS
+  , KILL
+  , BREAK
+  , CONT
   };
   sts(){}
 };
