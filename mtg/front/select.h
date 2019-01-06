@@ -12,13 +12,14 @@ int select_decks(Format format, vec<Deck>& r){
   str s;
   vec<Deck> decks;
 
-  fp = fopten(sprintf("%s/n.txt", DECK_DIRS[format]), "r");
+  //! replace with count .deck files in dir
+  fp = fopen(sprintf("%s/n.txt", DECK_DIRS[format]), "r");
   fscanf(fp, "%d", &nd);
   fclose(fp);
   for(i = 0; i < nd; ++i){
     //!
 
-    fp = fopten(sprintf("%s/d%4d.deck", DECK_DIRS[format], i), "r");
+    fp = fopen(sprintf("%s/d%4d.deck", DECK_DIRS[format], i), "r");
     fseek(fp, 0, SEEK_END);
     n = ftell(fp);
     fseek(fp, 0, SEEK_SET);

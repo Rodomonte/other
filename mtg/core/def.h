@@ -3,7 +3,7 @@
 #ifndef def_h
 #define def_h
 
-#include "incl.h"
+#include "ncl.h"
 
 
 #define ll   long long

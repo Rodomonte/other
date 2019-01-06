@@ -1,12 +1,6 @@
-// PARSE
-
-#ifndef parse_h
-#define parse_h
-
-/*
+# PARSE UTIL
 
 lib = 'lib.json'
-
 
 nc = 0
 def repl(m):
@@ -69,10 +63,3 @@ for k, v in c.items():
   if len(d) % 100 == 0:
     print(len(d))
   d[k] = t2d(s2t(v))
-
-*/
-
-
-int parse(vec<Card>& lib){
-
-}
