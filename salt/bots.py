@@ -91,7 +91,7 @@ def bet_main(mode, salt, chars):
   return (col,bet)
 
 bots = []
-bots += [Bot('rcb0000@gmail.com', 'rodomonte', 'natrunner4never', bet_main)]
+bots += [Bot('rcb0000@gmail.com', 'rodomonte', '', bet_main)]
 bots += [Bot('chachebiku@throwam.com', 'spicysalmon', 'mg81o04pd7gh6', \
               bet_favor)]
 bots += [Bot('rotibathel@throwam.com', 'ableanchovy', 'j48fvjxcms874', \
