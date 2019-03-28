@@ -27,6 +27,9 @@ def cross(a, b):
 def pldist(a, b, c): # distance from a to line(b, c)
   return vlen(cross(vsub(a, b), vsub(a, c))) / vlen(vsub(b, c))
 
+def side(a, b):
+  return vlen(a) + vlen(b) > 1.05 * vlen(vsub(a, b))
+
 months = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, \
           'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
 def datelt(a, b):
@@ -112,18 +115,23 @@ for date in u.keys():
         d = pldist(a[k][0], a[i][0], a[j][0])
         if d + sun < ERR:
           print('3', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
-                ':', d+sun)
+                ':', d+sun, '********' if side(a[i][0], a[j][0]) and \
+                            side(a[i][0], a[k][0]) else '')
 
         for ii in range(k+1, len(a)):
           if ii == i or ii == j: continue
           d2 = pldist(a[ii][0], a[i][0], a[j][0])
           if d + sun < ERR and d2 + sun < ERR:
             print('4', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
-                  '---', a[ii][1], ':', d, d2)
+                  '---', a[ii][1], ':', d, d2, \
+                  '********' if side(a[i][0], a[j][0]) and \
+                  side(a[i][0], a[k][0]) and side(a[i][0], a[ii][0]) else '')
 
           s = d + d2 + sun
           if len(p4) < TOP or s < m4:
-            p4[s] = (date, a[i][1], a[j][1], a[k][1], a[ii][1])
+            p4[s] = (date, a[i][1], a[j][1], a[k][1], a[ii][1], \
+                     '********' if side(a[i][0], a[j][0]) and \
+                     side(a[i][0], a[k][0]) else '')
             if len(p4) == TOP+1:
               skeys = sorted(p4.keys())
               del p4[skeys[-1]]
