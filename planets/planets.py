@@ -45,7 +45,7 @@ def datelt(a, b):
 # PARSE
 
 mb = []
-chdir('data/future')
+chdir('data/future2')
 files = listdir('.')
 n = 0
 for fname in files:
@@ -85,7 +85,7 @@ for fname in files:
 
 # COLINEARITY
 
-ERR = 0.005
+ERR = 0.05
 TOP = 2000
 
 N = len(mb)
@@ -106,20 +106,22 @@ for date in u.keys():
 
   for i in range(len(a)-2):
     for j in range(i+1, len(a)-1):
+      sun = pldist((0,0,0), a[i][0], a[j][0])
       for k in range(len(a)):
         if k == i or k == j: continue
         d = pldist(a[k][0], a[i][0], a[j][0])
-        if d < ERR:
-          print('3', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], ':', d)
+        if d + sun < ERR:
+          print('3', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
+                ':', d+sun)
 
         for ii in range(k+1, len(a)):
           if ii == i or ii == j: continue
           d2 = pldist(a[ii][0], a[i][0], a[j][0])
-          if d < ERR and d2 < ERR:
+          if d + sun < ERR and d2 + sun < ERR:
             print('4', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
                   '---', a[ii][1], ':', d, d2)
 
-          s = d + d2 + pldist((0,0,0), a[i][0], a[j][0])
+          s = d + d2 + sun
           if len(p4) < TOP or s < m4:
             p4[s] = (date, a[i][1], a[j][1], a[k][1], a[ii][1])
             if len(p4) == TOP+1:
@@ -130,7 +132,7 @@ for date in u.keys():
           # for jj in range(ii+1, len(a)):
           #   if jj == i or jj == j: continue
           #   d3 = pldist(a[jj][0], a[i][0], a[j][0])
-          #   s = d + d2 + d3
+          #   s = d + d2 + d3 + sun
           #   if len(p5) < TOP+1 or s < m5:
           #     p5[s] = (date, a[i][1], a[j][1], a[k][1], a[ii][1], a[jj][1])
           #     if len(p5) == TOP+1:
@@ -141,6 +143,7 @@ for date in u.keys():
 print()
 for key in sorted(p4.keys()):
   print(key, p4[key])
-print()
-for key in sorted(p5.keys()):
-  print(key, p5[key])
+
+# print()
+# for key in sorted(p5.keys()):
+#   print(key, p5[key])
