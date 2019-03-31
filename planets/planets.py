@@ -48,7 +48,7 @@ def datelt(a, b):
 # PARSE
 
 mb = []
-chdir('data/future2')
+chdir('data/future')
 files = listdir('.')
 n = 0
 for fname in files:
@@ -89,6 +89,7 @@ for fname in files:
 # COLINEARITY
 
 ERR = 0.05
+ERRM = 0.01
 TOP = 2000
 
 N = len(mb)
@@ -113,7 +114,8 @@ for date in u.keys():
       for k in range(len(a)):
         if k == i or k == j: continue
         d = pldist(a[k][0], a[i][0], a[j][0])
-        if d + sun < ERR:
+        if (a[k][1] == 'luna' and d + sun < ERRM) or \
+           (a[k][1] != 'luna' and d + sun < ERR):
           print('3', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
                 ':', d+sun, '********' if side(a[i][0], a[j][0]) and \
                             side(a[i][0], a[k][0]) else '')
@@ -121,7 +123,10 @@ for date in u.keys():
         for ii in range(k+1, len(a)):
           if ii == i or ii == j: continue
           d2 = pldist(a[ii][0], a[i][0], a[j][0])
-          if d + sun < ERR and d2 + sun < ERR:
+          if ((a[k][1] == 'luna' and d + sun < ERRM) or \
+              (a[k][1] != 'luna' and d + sun < ERR)) and \
+             ((a[ii][1] == 'luna' and d2 + sun < ERRM) or \
+              (a[ii][1] != 'luna' and d2 + sun < ERR)):
             print('4', date, ':', a[i][1], '---', a[j][1], '---', a[k][1], \
                   '---', a[ii][1], ':', d, d2, \
                   '********' if side(a[i][0], a[j][0]) and \

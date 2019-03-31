@@ -16,21 +16,23 @@ using std::map;
 #define HN 5
 #define LHN 3
 
+
 const char RANK[RN] = {'2','3','4','5','6','7','8','9','T','J','Q','K','A'},
            SUIT[SN] = {'C','D','S','H'};
 const int CN = RN * SN;
 int RI[85], SI[86];
 
-struct Card {
-  char r,s;
-  Card(){}
-  Card(char r0, char s0): r(r0), s(s0) {}
-  bool operator==(Card o) const { return r == o.r && s == o.s; }
-  bool operator<(Card o) const { return RI[r] < RI[o.r]; }
-};
-vector<Card> DECK;
 
-const Card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
+struct card {
+  char r,s;
+  card(){}
+  card(char r0, char s0): r(r0), s(s0) {}
+  bool operator==(card o) const { return r == o.r && s == o.s; }
+  bool operator<(card o) const { return RI[r] < RI[o.r]; }
+};
+vector<card> DECK;
+
+const card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
            C7('7','C'), C8('8','C'), C9('9','C'), CT('T','C'), CJ('J','C'),
            CQ('Q','C'), CK('K','C'), CA('A','C'),
            D2('2','D'), D3('3','D'), D4('4','D'), D5('5','D'), D6('6','D'),
@@ -43,24 +45,44 @@ const Card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
            H7('7','H'), H8('8','H'), H9('9','H'), HT('T','H'), HJ('J','H'),
            HQ('Q','H'), HK('K','H'), HA('A','H');
 
-void shuf(vector<Card>& d){
-  int i,j;
-  Card t;
-  for(i = CN-1; i > 0; --i) j = rand()%(i+1), t = d[i], d[i] = d[j], d[j] = t;
+
+bool isrank(char c){
+  int i;
+  for(i = 0; i < RN; ++i)
+    if(c == RANK[i]) return true;
+  return false;
 }
 
-struct Hand {
-  Card c[HN];
-  Hand(Card c0[HN]){ int i; for(i = 0; i < HN; ++i) c[i] = c0[i]; };
+bool issuit(char c){
+  int i;
+  for(i = 0; i < SN; ++i)
+    if(c == SUIT[i]) return true;
+  return false;
+}
 
-  bool hasr(char r){
-    int i;
-    for(i = 0; i < HN; ++i) if(c[i].r == r) return true;
-    return false;
+void shuf(vector<card>& d){
+  int i,j;
+  card t;
+  for(i = CN-1; i > 0; --i)
+    j = rand()%(i+1), t = d[i], d[i] = d[j], d[j] = t;
+}
+
+
+struct Hand {
+  card c[HN];
+  Hand(card c0[HN]){ int i; for(i = 0; i < HN; ++i) c[i] = c0[i]; };
+
+  card top(){
+    int i,j,m;
+    for(i = 0, m = -1; i < HN; ++i)
+      if(RI[c[i].r] > m) m = RI[c[i].r], j = i;
+    return j;
   }
-  bool hass(char s){
+
+  bool has(char n){
     int i;
-    for(i = 0; i < HN; ++i) if(c[i].s == s) return true;
+    for(i = 0; i < HN; ++i)
+      if((isrank(n) && c[i].r == n) || (issuit(n) && c[i].s == n)) return true;
     return false;
   }
 
@@ -68,14 +90,16 @@ struct Hand {
   bool kind(int n){
     int i,j,k;
     for(i = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
+      for(j = k = 0; j < HN; ++j)
+        if(c[j].r == RANK[i]) ++k;
       if(k == n) return true;
     }
     return false;
   }
   bool kind(int n, char r){
     int j,k;
-    for(j = k = 0; j < HN; ++j) if(c[j].r == r) ++k;
+    for(j = k = 0; j < HN; ++j)
+      if(c[j].r == r) ++k;
     return k == n;
   }
 
@@ -83,13 +107,15 @@ struct Hand {
     char f,r;
     int i,j,k;
     for(i = f = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
+      for(j = k = 0; j < HN; ++j)
+        if(c[j].r == RANK[i]) ++k;
       if(k == 2){ f = 1, r = RANK[i]; break; }
     }
     if(!f) return false;
     for(i = f = 0; i < RN; ++i){
       if(RANK[i] == r) continue;
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
+      for(j = k = 0; j < HN; ++j)
+        if(c[j].r == RANK[i]) ++k;
       if(k == 2){ f = 1; break; }
     }
     return f;
@@ -100,7 +126,7 @@ struct Hand {
     int i,j;
     for(i = RN-1; i != RN-4; i = (i == RN-1) ? 0 : i+1){
       for(j = i, f = 1; j != ((i == RN-1) ? 4 : i+5); j = (j == RN-1) ? 0 : j+1)
-        if(!hasr(RANK[j])){ f = 0; break; }
+        if(!has(RANK[j])){ f = 0; break; }
       if(f) return true;
     }
     return false;
@@ -110,7 +136,8 @@ struct Hand {
     char f;
     int i,j;
     for(i = 0; i < SN; ++i){
-      for(j = 0, f = 1; j < HN; ++j) if(c[j].s != SUIT[i]){ f = 0; break; }
+      for(j = 0, f = 1; j < HN; ++j)
+        if(c[j].s != SUIT[i]){ f = 0; break; }
       if(f) return true;
     }
     return false;
@@ -118,16 +145,28 @@ struct Hand {
 
   bool fh(){ return kind(2) && kind(3); }
   bool sf(){ return st() && fl(); }
-  bool rf(){ return st() && fl() && hasr('A') && hasr('K'); };
+  bool rf(){ return st() && fl() && has('A') && has('K'); };
+
+  bool operator==(Hand& o) const {
+    if(rf() && o.rf()) return true;
+    if(sf() && o.sf() && c[top()].r == o.c[o.top()].r) return true;
+    if(kind(4) && o.kind(4) &&
+    return false;
+  }
 
   bool operator<(Hand& o) const {
-    //!
-    return false;
+    if(rf()){
+      if(o.rf
+    }
+    return _;
   }
 };
 
+
+// Result
 struct R { int n,w,t; R(){} R(int n0, int w0, int t0): n(n0), w(w0), t(t0) {} };
 
+// Texas Hold Em
 struct THE {
   /*
    - With starting hand XY, what % chance of winning with P players?
@@ -139,7 +178,7 @@ struct THE {
   map<string,R> m;
 
   // w=-1: lose, w=0: tie, w=1: win
-  void ins(Card a, Card b, char w){
+  void ins(card a, card b, char w){
     string k = "";
     map<string,R>::iterator it;
     k += (a.r < b.r) ? a.r : b.r, k += (a.r < b.r) ? b.r : a.r;
@@ -156,8 +195,8 @@ struct THE {
   // 2 <= p(#players) <= 10
   void best2(int p){
     int i,j, n;
-    Card h[10][2], b[5];
-    vector<Card> d;
+    card h[10][2], b[5];
+    vector<card> d;
 
     for(n = 1; 1; ++n){
       d = DECK, shuf(d);
@@ -168,12 +207,13 @@ struct THE {
   }
 } the ;
 
+
 void init(){
   int i,j;
   for(i = 0; i < RN; ++i) RI[RANK[i]] = i;
   for(i = 0; i < SN; ++i) SI[SUIT[i]] = i;
   for(i = 0; i < RN; ++i) for(j = 0; j < SN; ++j)
-    DECK.pb(Card(RANK[i], SUIT[j]));
+    DECK.pb(card(RANK[i], SUIT[j]));
 }
 
 int main(){
