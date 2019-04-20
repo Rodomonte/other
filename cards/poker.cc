@@ -18,7 +18,7 @@ using std::map;
 #define HN 5
 
 
-const char RANK[RN] = {'2','3','4','5','6','7','8','9','T','J','Q','K','A'},
+const char RANK[RN] = {'A','2','3','4','5','6','7','8','9','T','J','Q','K'},
            SUIT[SN] = {'C','D','S','H'};
 const int CN = RN * SN;
 int RI[85], SI[86];
@@ -65,6 +65,13 @@ const card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
 
 struct deck {
   vector<card> d;
+
+  void erase(card c){
+    vector<card>::iterator it;
+    for(it = d.begin(); it != d.end(); ++it)
+      if(*it == c){ d.erase(it); break; }
+  }
+
   void shuf(){
     int i,j;
     card t;
@@ -78,6 +85,14 @@ struct hand {
   vector<card> h;
   hand(){}
   hand(vector<card> h0): h(h0) {}
+
+  string str(){
+    int i;
+    string r = "";
+    for(i = 0; i < HN; ++i)
+      r += h[i].str(), r += " ";
+    return r;
+  }
 
   // card top(){
   //   int i,j,m;
@@ -161,14 +176,14 @@ struct dwhand : hand {
 
   bool st(){
     char f;
-    int i,j, n;
+    int i,j, n,t;
     for(n = i = 0; i < HN; ++i)
       if(h[i].r == '2') ++n;
     for(i = 0; i != RN-3; ++i){
-      for(j = i, f = 1; j != ((i == RN-4) ? 1 : i+5);
+      for(j = i, t = n, f = 1; j != ((i == RN-4) ? 1 : i+5);
           j = (j == RN-1) ? 0 : j+1){
         if(RANK[j] != '2' && has(RANK[j])) continue;
-        else if(n > 0) --n;
+        else if(t > 0) --t;
         else{ f = 0; break; }
       }
       if(f) return true;
@@ -201,7 +216,7 @@ struct dwhand : hand {
   bool rf(){
     if(!st() || !fl()) return false;
     int i,d,n;
-    for(i = 0; i < HN; ++i){
+    for(d = n = i = 0; i < HN; ++i){
       if(h[i].r == '2') ++d;
       if(h[i].r == 'A' || h[i].r == 'K' || h[i].r == 'Q' || h[i].r == 'J' ||
          h[i].r == 'T') ++n;
@@ -211,9 +226,14 @@ struct dwhand : hand {
 };
 
 struct DeucesWild {
+  int HOLDS, a[32];
+  dwhand h;
+  deck d;
+  map<double, int> r;
+
   int pay(dwhand h){
     if(h.rf() && !h.has('2')) return 250;
-    if(h.kind(4, 2)) return 200;
+    if(h.kind(4, '2')) return 200;
     if(h.rf() && h.has('2')) return 20;
     if(h.kind(5)) return 12;
     if(h.sf()) return 9;
@@ -226,29 +246,26 @@ struct DeucesWild {
   }
 
   void rand(){
-    char c;
-    int i, m,n,t, a[32];
-    dwhand h,hn;
-    deck d;
-    map<double, int> r;
+    int i, m,n,t;
+    dwhand hn;
     map<double, int>::reverse_iterator rt;
 
-    const int HOLDS = 5;
-
-    for(m = 0; m < (1 << HOLDS); ++m)
-      a[m] = 0;
-    d = DECK, d.shuf(), n = 0;
+    HOLDS = 5;
+    for(i = 0; i < (1 << HOLDS); ++i)
+      a[i] = 0;
+    d = DECK, d.shuf(), h.h.clear();
     for(i = 0; i < HN; ++i)
       h.h.pb(d.d.back()), d.d.pop_back();
 
-    while(++n < 10000){
+    n = 0;
+    while(++n < 15000){
       for(m = 0; m < (1 << HOLDS); ++m){
         hn = h, d.shuf();
         for(t = i = 0; i < HN; ++i)
           if(!(m & (1 << i))) hn.h.erase(hn.h.begin()+i-t), ++t;
         for(i = 0; i < t; ++i)
           hn.h.pb(d.d[i]);
-        a[m] += pay(hn);
+        a[m] += (t = pay(hn));
       }
 
       if(!(n % 100)){
@@ -268,6 +285,44 @@ struct DeucesWild {
       }
     }
   }
+
+  void query(){
+    int i, n,p,t;
+    char b[16];
+    card c;
+    dwhand hn;
+
+    printf("Hold: ");
+    scanf("%s", b);
+    d = DECK, d.shuf(), h.h.clear();
+    if(b[0]){
+      for(i = 0; i < HN*3; i += 3){
+        c.r = b[i], c.s = b[i+1];
+        h.h.pb(c), d.erase(c);
+        if(!b[i+2]) break;
+      }
+    }
+
+    n = p = 0;
+    while(++n < 300000){
+      hn = h, d.shuf(), t = HN - hn.h.size();
+      for(i = 0; i < t; ++i)
+        hn.h.pb(d.d[i]);
+      p += pay(hn);
+
+      // if(hn.rf() && !hn.has('2')) printf("Royal Flush\n");
+      // if(hn.kind(4, '2')) printf("Four Deuces: %s\n", hn.str().c_str());
+      // if(hn.rf() && hn.has('2')) printf("Royal Flush with Deuce\n");
+      // if(hn.kind(5)) printf("Five of a Kind\n");
+      // if(hn.sf()) printf("Straight Flush\n");
+      // if(hn.kind(4)) printf("Four of a Kind\n");
+      // if(hn.fh()) printf("Full House");
+      // if(hn.fl()) printf("Flush\n");
+      // if(hn.st()) printf("Straight\n");
+      // if(h.kind(3)) printf("Three of a Kind\n");
+    }
+    printf("Expected: %.2lf\n", (double)p / n);
+  }
 } dw ;
 
 
@@ -284,5 +339,6 @@ int main(){
   init();
   while(1)
     dw.rand(), printf("\n!!!!!!!!\n"), gc();
+  // dw.query();
   return 0;
 }
