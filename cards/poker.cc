@@ -1,5 +1,6 @@
 // POKER
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -45,7 +46,7 @@ struct card {
   card& operator=(card o){ r = o.r, s = o.s; }
   bool operator==(card o){ return r == o.r && s == o.s; }
   bool operator<(card o){ return RI[r] < RI[o.r]; }
-  string str(){ return string(""+r) + string(""+s); }
+  string str(){ return string("") + r + s; }
 };
 
 const card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
@@ -163,10 +164,10 @@ struct dwhand : hand {
     int i,j, n;
     for(n = i = 0; i < HN; ++i)
       if(h[i].r == '2') ++n;
-    for(i = RN-1; i != RN-4; i = (i == RN-1) ? 0 : i+1){
-      for(j = i, f = 1; j != ((i == RN-1) ? 4 : i+5);
+    for(i = 0; i != RN-3; ++i){
+      for(j = i, f = 1; j != ((i == RN-4) ? 1 : i+5);
           j = (j == RN-1) ? 0 : j+1){
-        if(has(RANK[j])) continue;
+        if(RANK[j] != '2' && has(RANK[j])) continue;
         else if(n > 0) --n;
         else{ f = 0; break; }
       }
@@ -226,45 +227,44 @@ struct DeucesWild {
 
   void rand(){
     char c;
-    int i,j, m,n,t, a[32];
+    int i, m,n,t, a[32];
     dwhand h,hn;
     deck d;
     map<double, int> r;
-    map<double, int>::iterator it;
+    map<double, int>::reverse_iterator rt;
 
     const int HOLDS = 5;
 
     for(m = 0; m < (1 << HOLDS); ++m)
       a[m] = 0;
-    d = DECK, d.shuf();
+    d = DECK, d.shuf(), n = 0;
     for(i = 0; i < HN; ++i)
       h.h.pb(d.d.back()), d.d.pop_back();
-    t = 0;
 
-    while(++t){
+    while(++n < 10000){
       for(m = 0; m < (1 << HOLDS); ++m){
         hn = h, d.shuf();
-        for(n = t = i = 0; i < HOLDS; ++i){
-          if(m & (1 << i)) ++n;
-          else hn.h.erase(hn.h.begin()+i-t), ++t;
-        }
-        for(i = 0; i < n; ++i)
+        for(t = i = 0; i < HN; ++i)
+          if(!(m & (1 << i))) hn.h.erase(hn.h.begin()+i-t), ++t;
+        for(i = 0; i < t; ++i)
           hn.h.pb(d.d[i]);
         a[m] += pay(hn);
       }
 
-      r.clear();
-      for(m = 0; m < (1 << HOLDS); ++m)
-        r[(double)a[m] / t] = m;
-      printf("\n\n");
-      for(i = 0; i < HN; ++i)
-        printf("%s ", h.h[i].str().c_str());
-      printf(":\n");
-      for(it = r.begin(); it != r.end(); ++it){
-        printf("%.2lf:", it->first);
-        for(i = 0; i < n; ++i)
-          if(it->second & (1 << i)) printf(" %s", h.h[i].str().c_str());
-        printf("\n");
+      if(!(n % 100)){
+        r.clear();
+        for(m = 0; m < (1 << HOLDS); ++m)
+          r[(double)a[m] / n] = m;
+        printf("\n\n");
+        for(i = 0; i < HN; ++i)
+          printf("%s ", h.h[i].str().c_str());
+        printf(":\n");
+        for(rt = r.rbegin(); rt != r.rend(); ++rt){
+          printf("%.2lf:", rt->first);
+          for(i = 0; i < HN; ++i)
+            if(rt->second & (1 << i)) printf(" %s", h.h[i].str().c_str());
+          printf("\n");
+        }
       }
     }
   }
@@ -273,6 +273,7 @@ struct DeucesWild {
 
 void init(){
   int i,j;
+  srand(time(0));
   for(i = 0; i < RN; ++i) RI[RANK[i]] = i;
   for(i = 0; i < SN; ++i) SI[SUIT[i]] = i;
   for(i = 0; i < RN; ++i) for(j = 0; j < SN; ++j)
@@ -282,6 +283,6 @@ void init(){
 int main(){
   init();
   while(1)
-    dw.rand(), gc();
+    dw.rand(), printf("\n!!!!!!!!\n"), gc();
   return 0;
 }
