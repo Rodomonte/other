@@ -21,7 +21,6 @@ const char RANK[RN] = {'2','3','4','5','6','7','8','9','T','J','Q','K','A'},
            SUIT[SN] = {'C','D','S','H'};
 const int CN = RN * SN;
 int RI[85], SI[86];
-deck DECK;
 
 
 bool isrank(char c){
@@ -46,7 +45,7 @@ struct card {
   card& operator=(card o){ r = o.r, s = o.s; }
   bool operator==(card o){ return r == o.r && s == o.s; }
   bool operator<(card o){ return RI[r] < RI[o.r]; }
-  string str(){ return string(r) + string(s); }
+  string str(){ return string(""+r) + string(""+s); }
 };
 
 const card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
@@ -71,34 +70,20 @@ struct deck {
     for(i = d.size()-1; i > 0; --i)
       j = rand()%(i+1), t = d[i], d[i] = d[j], d[j] = t;
   }
-};
+} DECK ;
 
-
-enum opts {
-  KIND3
-, STRAIGHT
-, FLUSH
-, FULLHOUSE
-, KIND4
-, STRAIGHTFLUSH
-, KIND5
-, ROYALFLUSHW2
-, FOURDEUCE
-, ROYALFLUSH
-};
-
-int pay[10] = {1, 2, 3, 4, 4, 9, 12, 20, 200, 250};
 
 struct hand {
   vector<card> h;
+  hand(){}
   hand(vector<card> h0): h(h0) {}
 
-  card top(){
-    int i,j,m;
-    for(i = 0, m = -1; i < HN; ++i)
-      if(RI[h[i].r] > m) m = RI[h[i].r], j = i;
-    return j;
-  }
+  // card top(){
+  //   int i,j,m;
+  //   for(i = 0, m = -1; i < HN; ++i)
+  //     if(RI[h[i].r] > m) m = RI[h[i].r], j = i;
+  //   return j;
+  // }
 
   bool has(char n){
     int i;
@@ -107,80 +92,19 @@ struct hand {
     return false;
   }
 
-  // EXACTLY n of a kind
-  bool kind(int n){
-    int i,j,k;
-    for(i = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if(k == n) return true;
-    }
-    return false;
-  }
-  bool kind(int n, char r){
-    int j,k;
-    for(j = k = 0; j < HN; ++j)
-      if(h[j].r == r) ++k;
-    return k == n;
-  }
+  // bool operator==(hand& o) const {
+  //   if(rf() && o.rf()) return true;
+  //   if(sf() && o.sf() && h[top()].r == o.h[o.top()].r) return true;
+  //   if(kind(4) && o.kind(4) &&
+  //   return false;
+  // }
 
-  bool twop(){
-    char f,r;
-    int i,j,k;
-    for(i = f = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if(k == 2){ f = 1, r = RANK[i]; break; }
-    }
-    if(!f) return false;
-    for(i = f = 0; i < RN; ++i){
-      if(RANK[i] == r) continue;
-      for(j = k = 0; j < HN; ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if(k == 2){ f = 1; break; }
-    }
-    return f;
-  }
-
-  bool st(){
-    char f;
-    int i,j;
-    for(i = RN-1; i != RN-4; i = (i == RN-1) ? 0 : i+1){
-      for(j = i, f = 1; j != ((i == RN-1) ? 4 : i+5); j = (j == RN-1) ? 0 : j+1)
-        if(!has(RANK[j])){ f = 0; break; }
-      if(f) return true;
-    }
-    return false;
-  }
-
-  bool fl(){
-    char f;
-    int i,j;
-    for(i = 0; i < SN; ++i){
-      for(j = 0, f = 1; j < HN; ++j)
-        if(h[j].s != SUIT[i]){ f = 0; break; }
-      if(f) return true;
-    }
-    return false;
-  }
-
-  bool fh(){ return kind(2) && kind(3); }
-  bool sf(){ return st() && fl(); }
-  bool rf(){ return st() && fl() && has('A') && has('K'); };
-
-  bool operator==(Hand& o) const {
-    if(rf() && o.rf()) return true;
-    if(sf() && o.sf() && h[top()].r == o.h[o.top()].r) return true;
-    if(kind(4) && o.kind(4) &&
-    return false;
-  }
-
-  bool operator<(Hand& o) const {
-    // if(rf()){
-    //   if(o.rf
-    // }
-    return true;
-  }
+  // bool operator<(hand& o) const {
+  //   if(rf()){
+  //     if(o.rf
+  //   }
+  //   return true;
+  // }
 };
 
 
@@ -214,16 +138,102 @@ struct TexasHoldEm {
 } the ;
 
 
+struct dwhand : hand {
+  dwhand(){}
+
+  // EXACTLY n of a kind
+  bool kind(int n){
+    int i,j,k;
+    for(i = 0; i < RN; ++i){
+      for(j = k = 0; j < HN; ++j)
+        if(h[j].r == RANK[i] || h[j].r == '2') ++k;
+      if(k == n) return true;
+    }
+    return false;
+  }
+  bool kind(int n, char r){
+    int j,k;
+    for(j = k = 0; j < HN; ++j)
+      if(h[j].r == r || h[j].r == '2') ++k;
+    return k == n;
+  }
+
+  bool st(){
+    char f;
+    int i,j, n;
+    for(n = i = 0; i < HN; ++i)
+      if(h[i].r == '2') ++n;
+    for(i = RN-1; i != RN-4; i = (i == RN-1) ? 0 : i+1){
+      for(j = i, f = 1; j != ((i == RN-1) ? 4 : i+5);
+          j = (j == RN-1) ? 0 : j+1){
+        if(has(RANK[j])) continue;
+        else if(n > 0) --n;
+        else{ f = 0; break; }
+      }
+      if(f) return true;
+    }
+    return false;
+  }
+
+  bool fl(){
+    char f;
+    int i,j;
+    for(i = 0; i < SN; ++i){
+      for(j = 0, f = 1; j < HN; ++j)
+        if(h[j].s != SUIT[i] && h[j].r != '2'){ f = 0; break; }
+      if(f) return true;
+    }
+    return false;
+  }
+
+  bool fh(){
+    int i,j, r[RN]={0};
+    for(i = 0; i < HN; ++i)
+      ++r[RI[h[i].r]];
+    for(i = j = 0; i < RN; ++i)
+      if(RANK[i] != '2') ++j;
+    return (j == 2);
+  }
+
+  bool sf(){ return st() && fl(); }
+
+  bool rf(){
+    if(!st() || !fl()) return false;
+    int i,d,n;
+    for(i = 0; i < HN; ++i){
+      if(h[i].r == '2') ++d;
+      if(h[i].r == 'A' || h[i].r == 'K' || h[i].r == 'Q' || h[i].r == 'J' ||
+         h[i].r == 'T') ++n;
+    }
+    return (d + n == 5);
+  };
+};
+
 struct DeucesWild {
+  int pay(dwhand h){
+    if(h.rf() && !h.has('2')) return 250;
+    if(h.kind(4, 2)) return 200;
+    if(h.rf() && h.has('2')) return 20;
+    if(h.kind(5)) return 12;
+    if(h.sf()) return 9;
+    if(h.kind(4)) return 4;
+    if(h.fh()) return 4;
+    if(h.fl()) return 3;
+    if(h.st()) return 2;
+    if(h.kind(3)) return 1;
+    return 0;
+  }
+
   void rand(){
     char c;
     int i,j, m,n,t, a[32];
-    hand h,hn;
+    dwhand h,hn;
     deck d;
     map<double, int> r;
     map<double, int>::iterator it;
 
     const int HOLDS = 5;
+
     for(m = 0; m < (1 << HOLDS); ++m)
       a[m] = 0;
     d = DECK, d.shuf();
@@ -240,7 +250,7 @@ struct DeucesWild {
         }
         for(i = 0; i < n; ++i)
           hn.h.pb(d.d[i]);
-        a[m] += hn.pay();
+        a[m] += pay(hn);
       }
 
       r.clear();
@@ -250,7 +260,7 @@ struct DeucesWild {
       for(i = 0; i < HN; ++i)
         printf("%s ", h.h[i].str().c_str());
       printf(":\n");
-      for(it = r.begin(); it != r.end(); ++it)
+      for(it = r.begin(); it != r.end(); ++it){
         printf("%.2lf:", it->first);
         for(i = 0; i < n; ++i)
           if(it->second & (1 << i)) printf(" %s", h.h[i].str().c_str());
