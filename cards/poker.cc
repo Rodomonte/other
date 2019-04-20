@@ -207,7 +207,7 @@ struct dwhand : hand {
     for(i = 0; i < HN; ++i)
       ++r[RI[h[i].r]];
     for(i = j = 0; i < RN; ++i)
-      if(RANK[i] != '2') ++j;
+      if(RANK[i] != '2' && r[i]) ++j;
     return (j == 2);
   }
 
