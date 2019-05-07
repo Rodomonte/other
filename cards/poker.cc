@@ -1,5 +1,6 @@
 // POKER
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -10,27 +11,45 @@ using std::string;
 using std::vector;
 using std::map;
 
+#define gc getchar_unlocked
 #define pb push_back
 #define SN 4
 #define RN 13
 #define HN 5
-#define LHN 3
 
-const char RANK[RN] = {'2','3','4','5','6','7','8','9','T','J','Q','K','A'},
+
+const char RANK[RN] = {'A','2','3','4','5','6','7','8','9','T','J','Q','K'},
            SUIT[SN] = {'C','D','S','H'};
 const int CN = RN * SN;
 int RI[85], SI[86];
 
-struct Card {
-  char r,s;
-  Card(){}
-  Card(char r0, char s0): r(r0), s(s0) {}
-  bool operator==(Card o) const { return r == o.r && s == o.s; }
-  bool operator<(Card o) const { return RI[r] < RI[o.r]; }
-};
-vector<Card> DECK;
 
-const Card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
+bool isrank(char c){
+  int i;
+  for(i = 0; i < RN; ++i)
+    if(c == RANK[i]) return true;
+  return false;
+}
+
+bool issuit(char c){
+  int i;
+  for(i = 0; i < SN; ++i)
+    if(c == SUIT[i]) return true;
+  return false;
+}
+
+
+struct card {
+  char r,s;
+  card(){}
+  card(char r0, char s0): r(r0), s(s0) {}
+  card& operator=(card o){ r = o.r, s = o.s; }
+  bool operator==(card o){ return r == o.r && s == o.s; }
+  bool operator<(card o){ return RI[r] < RI[o.r]; }
+  string str(){ return string("") + r + s; }
+};
+
+const card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
            C7('7','C'), C8('8','C'), C9('9','C'), CT('T','C'), CJ('J','C'),
            CQ('Q','C'), CK('K','C'), CA('A','C'),
            D2('2','D'), D3('3','D'), D4('4','D'), D5('5','D'), D6('6','D'),
@@ -43,92 +62,72 @@ const Card C2('2','C'), C3('3','C'), C4('4','C'), C5('5','C'), C6('6','C'),
            H7('7','H'), H8('8','H'), H9('9','H'), HT('T','H'), HJ('J','H'),
            HQ('Q','H'), HK('K','H'), HA('A','H');
 
-void shuf(vector<Card>& d){
-  int i,j;
-  Card t;
-  for(i = CN-1; i > 0; --i) j = rand()%(i+1), t = d[i], d[i] = d[j], d[j] = t;
-}
 
-struct Hand {
-  Card c[HN];
-  Hand(Card c0[HN]){ int i; for(i = 0; i < HN; ++i) c[i] = c0[i]; };
+struct deck {
+  vector<card> d;
 
-  bool hasr(char r){
-    int i;
-    for(i = 0; i < HN; ++i) if(c[i].r == r) return true;
-    return false;
-  }
-  bool hass(char s){
-    int i;
-    for(i = 0; i < HN; ++i) if(c[i].s == s) return true;
-    return false;
+  void erase(card c){
+    vector<card>::iterator it;
+    for(it = d.begin(); it != d.end(); ++it)
+      if(*it == c){ d.erase(it); break; }
   }
 
-  // EXACTLY n of a kind
-  bool kind(int n){
-    int i,j,k;
-    for(i = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
-      if(k == n) return true;
-    }
-    return false;
-  }
-  bool kind(int n, char r){
-    int j,k;
-    for(j = k = 0; j < HN; ++j) if(c[j].r == r) ++k;
-    return k == n;
-  }
-
-  bool twop(){
-    char f,r;
-    int i,j,k;
-    for(i = f = 0; i < RN; ++i){
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
-      if(k == 2){ f = 1, r = RANK[i]; break; }
-    }
-    if(!f) return false;
-    for(i = f = 0; i < RN; ++i){
-      if(RANK[i] == r) continue;
-      for(j = k = 0; j < HN; ++j) if(c[j].r == RANK[i]) ++k;
-      if(k == 2){ f = 1; break; }
-    }
-    return f;
-  }
-
-  bool st(){
-    char f;
+  void shuf(){
     int i,j;
-    for(i = RN-1; i != RN-4; i = (i == RN-1) ? 0 : i+1){
-      for(j = i, f = 1; j != ((i == RN-1) ? 4 : i+5); j = (j == RN-1) ? 0 : j+1)
-        if(!hasr(RANK[j])){ f = 0; break; }
-      if(f) return true;
-    }
+    card t;
+    for(i = d.size()-1; i > 0; --i)
+      j = rand()%(i+1), t = d[i], d[i] = d[j], d[j] = t;
+  }
+} DECK ;
+
+
+struct hand {
+  vector<card> h;
+  hand(){}
+  hand(vector<card> h0): h(h0) {}
+
+  string str(){
+    int i;
+    string r = "";
+    for(i = 0; i < HN; ++i)
+      r += h[i].str(), r += " ";
+    return r;
+  }
+
+  // card top(){
+  //   int i,j,m;
+  //   for(i = 0, m = -1; i < HN; ++i)
+  //     if(RI[h[i].r] > m) m = RI[h[i].r], j = i;
+  //   return j;
+  // }
+
+  bool has(char n){
+    int i;
+    for(i = 0; i < HN; ++i)
+      if((isrank(n) && h[i].r == n) || (issuit(n) && h[i].s == n)) return true;
     return false;
   }
 
-  bool fl(){
-    char f;
-    int i,j;
-    for(i = 0; i < SN; ++i){
-      for(j = 0, f = 1; j < HN; ++j) if(c[j].s != SUIT[i]){ f = 0; break; }
-      if(f) return true;
-    }
-    return false;
-  }
+  // bool operator==(hand& o) const {
+  //   if(rf() && o.rf()) return true;
+  //   if(sf() && o.sf() && h[top()].r == o.h[o.top()].r) return true;
+  //   if(kind(4) && o.kind(4) &&
+  //   return false;
+  // }
 
-  bool fh(){ return kind(2) && kind(3); }
-  bool sf(){ return st() && fl(); }
-  bool rf(){ return st() && fl() && hasr('A') && hasr('K'); };
-
-  bool operator<(Hand& o) const {
-    //!
-    return false;
-  }
+  // bool operator<(hand& o) const {
+  //   if(rf()){
+  //     if(o.rf
+  //   }
+  //   return true;
+  // }
 };
 
+
+// Result
 struct R { int n,w,t; R(){} R(int n0, int w0, int t0): n(n0), w(w0), t(t0) {} };
 
-struct THE {
+struct TexasHoldEm {
   /*
    - With starting hand XY, what % chance of winning with P players?
      e.g. AA > 50% with 2P, probably < 50% with more P
@@ -139,7 +138,7 @@ struct THE {
   map<string,R> m;
 
   // w=-1: lose, w=0: tie, w=1: win
-  void ins(Card a, Card b, char w){
+  void ins(card a, card b, char w){
     string k = "";
     map<string,R>::iterator it;
     k += (a.r < b.r) ? a.r : b.r, k += (a.r < b.r) ? b.r : a.r;
@@ -152,32 +151,194 @@ struct THE {
       if(!w) ++it->second.t;
     }
   }
+} the ;
 
-  // 2 <= p(#players) <= 10
-  void best2(int p){
-    int i,j, n;
-    Card h[10][2], b[5];
-    vector<Card> d;
 
-    for(n = 1; 1; ++n){
-      d = DECK, shuf(d);
-      for(i = j = 0; i < 5; ++i) b[i] = d[j++];
-      for(i = 0; i < p; ++i) h[i][0] = d[j++], h[i][1] = d[j++];
+struct dwhand : hand {
+  dwhand(){}
 
+  // EXACTLY n of a kind
+  bool kind(int n){
+    int i,j,k;
+    for(i = 0; i < RN; ++i){
+      for(j = k = 0; j < HN; ++j)
+        if(h[j].r == RANK[i] || h[j].r == '2') ++k;
+      if(k == n) return true;
+    }
+    return false;
+  }
+  bool kind(int n, char r){
+    int j,k;
+    for(j = k = 0; j < HN; ++j)
+      if(h[j].r == r || h[j].r == '2') ++k;
+    return k == n;
+  }
+
+  bool st(){
+    char f;
+    int i,j, n,t;
+    for(n = i = 0; i < HN; ++i)
+      if(h[i].r == '2') ++n;
+    for(i = 0; i != RN-3; ++i){
+      for(j = i, t = n, f = 1; j != ((i == RN-4) ? 1 : i+5);
+          j = (j == RN-1) ? 0 : j+1){
+        if(RANK[j] != '2' && has(RANK[j])) continue;
+        else if(t > 0) --t;
+        else{ f = 0; break; }
+      }
+      if(f) return true;
+    }
+    return false;
+  }
+
+  bool fl(){
+    char f;
+    int i,j;
+    for(i = 0; i < SN; ++i){
+      for(j = 0, f = 1; j < HN; ++j)
+        if(h[j].s != SUIT[i] && h[j].r != '2'){ f = 0; break; }
+      if(f) return true;
+    }
+    return false;
+  }
+
+  bool fh(){
+    int i,j, r[RN]={0};
+    for(i = 0; i < HN; ++i)
+      ++r[RI[h[i].r]];
+    for(i = j = 0; i < RN; ++i)
+      if(RANK[i] != '2' && r[i]) ++j;
+    return (j == 2);
+  }
+
+  bool sf(){ return st() && fl(); }
+
+  bool rf(){
+    if(!st() || !fl()) return false;
+    int i,d,n;
+    for(d = n = i = 0; i < HN; ++i){
+      if(h[i].r == '2') ++d;
+      if(h[i].r == 'A' || h[i].r == 'K' || h[i].r == 'Q' || h[i].r == 'J' ||
+         h[i].r == 'T') ++n;
+    }
+    return (d + n == 5);
+  };
+};
+
+struct DeucesWild {
+  int HOLDS, a[32];
+  dwhand h;
+  deck d;
+  map<double, int> r;
+
+  int pay(dwhand h){
+    if(h.rf() && !h.has('2')) return 250;
+    if(h.kind(4, '2')) return 200;
+    if(h.rf() && h.has('2')) return 20;
+    if(h.kind(5)) return 12;
+    if(h.sf()) return 9;
+    if(h.kind(4)) return 4;
+    if(h.fh()) return 4;
+    if(h.fl()) return 3;
+    if(h.st()) return 2;
+    if(h.kind(3)) return 1;
+    return 0;
+  }
+
+  void rand(){
+    int i, m,n,t;
+    dwhand hn;
+    map<double, int>::reverse_iterator rt;
+
+    HOLDS = 5;
+    for(i = 0; i < (1 << HOLDS); ++i)
+      a[i] = 0;
+    d = DECK, d.shuf(), h.h.clear();
+    for(i = 0; i < HN; ++i)
+      h.h.pb(d.d.back()), d.d.pop_back();
+
+    n = 0;
+    while(++n < 15000){
+      for(m = 0; m < (1 << HOLDS); ++m){
+        hn = h, d.shuf();
+        for(t = i = 0; i < HN; ++i)
+          if(!(m & (1 << i))) hn.h.erase(hn.h.begin()+i-t), ++t;
+        for(i = 0; i < t; ++i)
+          hn.h.pb(d.d[i]);
+        a[m] += (t = pay(hn));
+      }
+
+      if(!(n % 100)){
+        r.clear();
+        for(m = 0; m < (1 << HOLDS); ++m)
+          r[(double)a[m] / n] = m;
+        printf("\n\n");
+        for(i = 0; i < HN; ++i)
+          printf("%s ", h.h[i].str().c_str());
+        printf(":\n");
+        for(rt = r.rbegin(); rt != r.rend(); ++rt){
+          printf("%.2lf:", rt->first);
+          for(i = 0; i < HN; ++i)
+            if(rt->second & (1 << i)) printf(" %s", h.h[i].str().c_str());
+          printf("\n");
+        }
+      }
     }
   }
-} the ;
+
+  void query(){
+    int i, n,p,t;
+    char b[16];
+    card c;
+    dwhand hn;
+
+    printf("Hold: ");
+    scanf("%s", b);
+    d = DECK, d.shuf(), h.h.clear();
+    if(b[0]){
+      for(i = 0; i < HN*3; i += 3){
+        c.r = b[i], c.s = b[i+1];
+        h.h.pb(c), d.erase(c);
+        if(!b[i+2]) break;
+      }
+    }
+
+    n = p = 0;
+    while(++n < 300000){
+      hn = h, d.shuf(), t = HN - hn.h.size();
+      for(i = 0; i < t; ++i)
+        hn.h.pb(d.d[i]);
+      p += pay(hn);
+
+      // if(hn.rf() && !hn.has('2')) printf("Royal Flush\n");
+      // if(hn.kind(4, '2')) printf("Four Deuces: %s\n", hn.str().c_str());
+      // if(hn.rf() && hn.has('2')) printf("Royal Flush with Deuce\n");
+      // if(hn.kind(5)) printf("Five of a Kind\n");
+      // if(hn.sf()) printf("Straight Flush\n");
+      // if(hn.kind(4)) printf("Four of a Kind\n");
+      // if(hn.fh()) printf("Full House");
+      // if(hn.fl()) printf("Flush\n");
+      // if(hn.st()) printf("Straight\n");
+      // if(h.kind(3)) printf("Three of a Kind\n");
+    }
+    printf("Expected: %.2lf\n", (double)p / n);
+  }
+} dw ;
+
 
 void init(){
   int i,j;
+  srand(time(0));
   for(i = 0; i < RN; ++i) RI[RANK[i]] = i;
   for(i = 0; i < SN; ++i) SI[SUIT[i]] = i;
   for(i = 0; i < RN; ++i) for(j = 0; j < SN; ++j)
-    DECK.pb(Card(RANK[i], SUIT[j]));
+    DECK.d.pb(card(RANK[i], SUIT[j]));
 }
 
 int main(){
   init();
-  the.best2(2);
+  while(1)
+    dw.rand(), printf("\n!!!!!!!!\n"), gc();
+  // dw.query();
   return 0;
 }
