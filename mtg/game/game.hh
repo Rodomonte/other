@@ -1,10 +1,10 @@
 // GAME
 
-#ifndef game_h
-#define game_h
+#ifndef game_hh
+#define game_hh
 
-#include "bot.h"
-#include "log.h"
+#include "bot.hh"
+#include "log.hh"
 
 
 struct Game {
@@ -42,7 +42,7 @@ struct Game {
     return n >= np-1;
   }
 
-  int draw(vd& d, umap<str, Card> m, int n){
+  stat draw(vd& d, umap<str, Card> m, int n){
     int i;
     for(i = 0; i < n; ++i){
       if(!d.empty())
@@ -50,7 +50,7 @@ struct Game {
     return 0;
   }
 
-  int init(){
+  stat init(){
     int i;
     np = bots.size();
     turn = 0;
@@ -65,13 +65,13 @@ struct Game {
     return 0;
   }
 
-  int step(){
+  stat step(){
 
     //! write file
     return 0;
   }
 
-  int run(){
+  stat run(){
     check(init());
     while(1){
       check(step());

@@ -1,9 +1,9 @@
 // UTIL
 
-#ifndef util_h
-#define util_h
+#ifndef util_hh
+#define util_hh
 
-#include "const.h"
+#include "const.hh"
 
 
 // Globals
@@ -11,24 +11,37 @@
 char buf[1048576]
    , err[2048];
 
+vec<Card> lib;
+vec<Deck> decks;
 
-#define kill() quit(__FILE__, __FUNCTION__);
 
-#define check(r) if(r == PASS) {} \
-            else if(r == 2) break; \
-            else if(r == 3) continue; \
-            else            kill();
-
+// Methods
 
 void quit(const char* file, const char* fn){
   printf("Exiting from %s::%s\n", file, fn);
   exit(0);
 }
 
-int call(str& cmd){
+#define kill() quit(__FILE__, __FUNCTION__);
+
+enum stat {
+  KILL
+, BACK
+, PASS
+, CONT
+, BREAK
+};
+
+#define check(r) if(r == KILL) kill(); \
+            else if(r == BACK) return; \
+            else if(r == PASS) {} \
+            else if(r == CONT) continue; \
+            else if(r == BREAK) break;
+
+stat call(str& cmd){
   int r;
   r = system(cmd);
-  return (WIFEXITED(r) && !WEXITSTATUS(r)) ? 2 : 0;
+  return (WIFEXITED(r) && !WEXITSTATUS(r)) ? PASS : KILL;
 }
 
 

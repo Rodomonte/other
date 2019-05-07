@@ -1,9 +1,9 @@
 // CONST
 
-#ifndef const_h
-#define const_h
+#ifndef const_hh
+#define const_hh
 
-#include "def.h"
+#include "def.hh"
 
 
 const str

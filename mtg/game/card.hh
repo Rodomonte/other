@@ -1,16 +1,16 @@
 // CARD
 
-#ifndef card_h
-#define card_h
+#ifndef card_hh
+#define card_hh
 
-#include "util.h"
+#include "../core/util.hh"
 
 
 struct Card {
   int            id, mw, mu, mb, mr, mg, mc, mg, pow, tuf, tpow, ttuf;
   str            name;
-  vs             types;
-  us      quals;
+  vec<str>       types;
+  uset<str>      quals;
   umap<str, int> counters;
 
   Card(str& _name, int _mw, int _mu, int _mb, int _mr, int _mg, int _mcol
@@ -26,11 +26,11 @@ struct Card {
   }
   bool nlperm(){ return perm() && !in(LAN, types); }
 
-  int load(int id){
+  stat load(int id){
 
   }
 
-  int write(){
+  stat write(){
 
   }
 };

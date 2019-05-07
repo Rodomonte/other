@@ -1,20 +1,22 @@
 // SIM
 
-#ifndef sim_h
-#define sim_h
+#ifndef sim_hh
+#define sim_hh
 
-//#include "game.h"
-#include "select.h"
+//#include "game.hh"
+#include "select.hh"
 
 
 struct Sim {
+  Game game;
+
   Sim(){}
 
-  int init(){
-    int opt;
-    Format format;
-    vec<Bot> bots;
-    vd decks;
+  stat init(){
+    int       opt;
+    Format    format;
+    vec<Bot>  bots;
+    vec<Deck> decks;
 
     opt = -1;
     while(opt < 0 || opt > 3){
@@ -34,13 +36,13 @@ struct Sim {
     return 0;
   }
 
-  int play(vd& decks){
+  stat play(vec<Deck>& decks){
     check(init());
     check(game.run());
     return 0;
   }
 
-  int sim(vd& decks){
+  stat sim(vec<Deck>& decks){
 
     return 0;
   }

@@ -1,20 +1,20 @@
 // VIEW
 
-#ifndef view_h
-#define view_h
+#ifndef view_hh
+#define view_hh
 
-#include "util.h"
+#include "../game/deck.hh"
 
 
-int view_lib(vc& lib){
+stat view_lib(vec<Card>& lib){
   check(parse());
-    printf("Loading card library..\n");
+  printf("Loading card library..\n");
   // if lib.map DNE, run parse
 
   return 0;
 }
 
-int view_decks(vd& decks){
+stat view_decks(vec<Deck>& decks){
 
   return 0;
 }

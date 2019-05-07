@@ -1,7 +1,8 @@
 // NCL
 
-#ifndef ncl_h
-#define ncl_h
+#ifndef ncl_hh
+#define ncl_hh
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,5 +17,6 @@ using std::vector;
 using std::map;
 using std::unordered_set;
 using std::unordered_map;
+
 
 #endif

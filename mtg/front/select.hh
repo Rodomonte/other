@@ -1,15 +1,15 @@
 // SELECT
 
-#ifndef select_h
-#define select_h
+#ifndef select_hh
+#define select_hh
 
 //#include "game.h"
 
 
-int select_decks(Format format, vec<Deck>& r){
-  int i, n, nd, np, opt;
-  FILE* fp;
-  str s;
+stat select_decks(Format format, vec<Deck>& r){
+  int       i,n,nd,np,opt;
+  FILE*     fp;
+  str       s;
   vec<Deck> decks;
 
   //! replace with count .deck files in dir
@@ -61,7 +61,7 @@ int select_decks(Format format, vec<Deck>& r){
 }
 
 
-int select_bots(vec<Bot>& r){
+stat select_bots(vec<Bot>& r){
 
 }
 

@@ -1,17 +1,17 @@
 // CREATE
 
-#ifndef create_h
-#define create_h
+#ifndef create_hh
+#define create_hh
 
-#include "util.h"
+#include "../core/util.hh"
 
 
-int create_card(){
+stat create_card(){
 
   return 0;
 }
 
-int create_deck(vec<Card>& lib){
+stat create_deck(vec<Card>& lib){
 
   return 0;
 }

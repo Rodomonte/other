@@ -1,14 +1,10 @@
 // MAIN
 
-#include "create.h"
-#include "load.h"
-#include "sim.h"
-#include "update.h"
-#include "view.h"
+#include "create.hh"
+#include "sim.hh"
+#include "update.hh"
+#include "view.hh"
 
-
-vec<Card> lib;
-vec<Deck> decks;
 
 int main(){
   int opt;
@@ -23,7 +19,7 @@ int main(){
       try{ scanf("%d", &opt); }catch(...){}
     }
 
-    check((opt == 0) ? 1
+    check((opt == 0) ? KILL
         : (opt == 1) ? update_lib(lib)
         : (opt == 2) ? view_lib(lib)
         : (opt == 3) ? view_decks(decks)
@@ -31,7 +27,7 @@ int main(){
         : (opt == 5) ? create_deck(lib)
         : (opt == 6) ? Sim().play(decks)
         : (opt == 7) ? Sim().sim(decks)
-        :             0
+        :              PASS
          );
 
   }

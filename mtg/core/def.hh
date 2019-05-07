@@ -1,12 +1,13 @@
 // DEF
 
-#ifndef def_h
-#define def_h
+#ifndef def_hh
+#define def_hh
 
-#include "ncl.h"
+#include "ncl.hh"
 
 
 #define ll   long long
+#define str  string
 
 #define vec  vector
 #define pb   push_back

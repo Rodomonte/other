@@ -1,19 +1,19 @@
 // DECK
 
-#ifndef deck_h
-#define deck_h
+#ifndef deck_hh
+#define deck_hh
 
-#include "card.h"
+#include "card.hh"
 
 
 struct Deck {
   int       id;
   Format    format;
   str       name;
-  vc main, side, extra;
+  vec<Card> main, side, extra;
 
   Deck(int _id, Format _format): id(_id), format(_format) {}
-  Deck(vc _main, vc _side, vc _extra):
+  Deck(vec<Card> _main, vec<Card> _side, vec<Card> _extra):
     main(_main), side(_side), extra(_extra) {}
 
   str file(){ return str(sprintf("%s/d%4d.deck", DECK_DIRS[format], id)); }
@@ -48,7 +48,7 @@ struct Deck {
   void to_file(){
     FILE* fp;
     fp = fopen(file().c_str(), "w");
-    fprintf(
+    //fprintf(
   }
 };
 
