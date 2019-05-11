@@ -28,15 +28,9 @@ enum stat {
   KILL
 , BACK
 , PASS
-, CONT
-, BREAK
 };
 
-#define check(r) if(r == KILL) kill(); \
-            else if(r == BACK) return; \
-            else if(r == PASS) {} \
-            else if(r == CONT) continue; \
-            else if(r == BREAK) break;
+void check(stat s){ if(s == KILL) kill(); }
 
 stat call(str& cmd){
   int r;

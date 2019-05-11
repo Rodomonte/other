@@ -1,5 +1,8 @@
 # salt util
 
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Chrome
+
 twins = [6858, 7172]
 url_login = 'http://www.saltybet.com/authenticate?signin=1'
 url_logout = 'http://www.saltybet.com/logout'
@@ -41,6 +44,14 @@ def prefix(t, d):
   t2 = search(t, d)
   s = len(t) - len(t2)
   return t[:s]
+
+def get_browser():
+  opts = Options()
+  opts.add_argument('--disable-bundled-ppapi-flash')
+  opts.add_extension('../../sw/Adblock-Plus_v1.12.4.crx')
+  br = Chrome(executable_path='../../sw/chromedriver', chrome_options=opts)
+  br.set_window_size(1536, 1024)
+  return br
 
 def login(br, bot):
   br.get(url_login)

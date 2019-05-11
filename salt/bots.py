@@ -73,7 +73,8 @@ def bet_random(mode, salt, chars):
 def bet_main(mode, salt, chars):
   rwr, bwr = chars[0][0].wr, chars[1][0].wr
   if mode == 'm':
-    if abs(rwr-bwr) < 0.2:   bet = salt * 0.003 # 24k at 8m
+    if salt < mcap:          bet = salt
+    elif abs(rwr-bwr) < 0.2: bet = salt * 0.003 # 24k at 8m
     elif abs(rwr-bwr) < 0.3: bet = salt * 0.005 # 40k
     elif abs(rwr-bwr) < 0.4: bet = salt * 0.01  # 80k
     elif abs(rwr-bwr) < 0.5: bet = salt * 0.02  # 160k
@@ -85,7 +86,7 @@ def bet_main(mode, salt, chars):
     col = 'r' if (abs(rwr-bwr) < 0.1 and rwr < bwr) or \
                  (abs(rwr-bwr) >= 0.1 and rwr > bwr) else 'b'
   else:
-    bet = salt * 0.001
+    bet = salt if salt < mcap else salt * 0.001
     col = 'r' if random.randint(1,2) == 1 else 'b'
   bet = int(round(bet))
   return (col,bet)

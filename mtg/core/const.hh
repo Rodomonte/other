@@ -13,7 +13,7 @@ const str
 
 , LIB_JSON  = LIB_DIR.join("lib.json")
 
-, MAIN_OPS =
+, MAIN_OPTS =
     "(0) Exit\n"
     "(1) Update Library\n"
     "(2) View Library\n"
@@ -24,11 +24,12 @@ const str
     "(7) Sim Games\n"
     "  > "
 
-, SIM_OPS =
+, SIM_OPTS =
     "(0)   Exit\n"
     "(1)   Back\n"
     "(2)   Ready\n"
     "(3 #) View\n"
+    "  > "
 
 , GEN_HEADER =
     "/*********************************************************/"

@@ -11,12 +11,12 @@ stat view_lib(vec<Card>& lib){
   printf("Loading card library..\n");
   // if lib.map DNE, run parse
 
-  return 0;
+  return PASS;
 }
 
 stat view_decks(vec<Deck>& decks){
 
-  return 0;
+  return PASS;
 }
 
 
