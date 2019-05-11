@@ -7,6 +7,8 @@
 # collect everyone's salt/bets, report max single salt/odds/rate win/loss,
 #   max gain/loss over time + # of bets
 # add 150k to main 10/3/16
+# group analysis: if same couple guys beat the same couple guys, pattern exists
+#   such that a typing can be assumed. This type beats that type.
 
 from selenium.webdriver import Chrome
 from plotly.offline import plot

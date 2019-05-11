@@ -1,5 +1,6 @@
 # salt util
 
+from time import sleep
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver import Chrome
 
@@ -58,3 +59,16 @@ def login(br, bot):
   br.find_element_by_id('email').send_keys(bot.email)
   br.find_element_by_id('pword').send_keys(bot.pword)
   br.find_element_by_class_name('graybutton').click()
+
+# Mute and pause
+def wait(br):
+  sleep(0.5)
+  br.switch_to.frame(br.find_element_by_id('iframeplayer'))
+  div = br.find_element_by_id('video-playback')
+  try:
+    if div.get_attribute('data-muted') == 'false':
+      br.find_element_by_class_name('player-button--volume').click()
+    if div.get_attribute('data-paused') == 'false':
+      br.find_element_by_class_name('player-button--playpause').click()
+  except WebDriverException: pass
+  br.switch_to_default_content()

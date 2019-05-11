@@ -7,7 +7,6 @@
 # exhib stats w/ palletes, team win rate handling
 
 from os.path import isfile
-from time import sleep
 from datetime import datetime
 from pickle import load, dump
 from selenium.common.exceptions import WebDriverException
@@ -28,24 +27,12 @@ if isfile('salt.dat'):
 br = get_browser()
 login(br, bots[0])
 
-# Mute and pause
-def wait():
-  sleep(0.5)
-  br.switch_to.frame(br.find_element_by_id('iframeplayer'))
-  div = br.find_element_by_id('video-playback')
-  try:
-    if div.get_attribute('data-muted') == 'false':
-      br.find_element_by_class_name('player-button--volume').click()
-    if div.get_attribute('data-paused') == 'false':
-      br.find_element_by_class_name('player-button--playpause').click()
-  except WebDriverException: pass
-  br.switch_to_default_content()
-
-# Wait until bet opens
+# Wait until bets open
+psalt, match = [-1, -1], None
 while True:
   try:
     while search(br.page_source, 'Bets are OPEN!') == '':
-      wait()
+      wait(br)
 
     # Determine game mode
     br.get(url_bracket)
@@ -86,16 +73,23 @@ while True:
 
     # Login
     br.get(url_main)
-    for bot in bots[:2]:
-      if bot != bots[0]:
+    for k in range(2):
+      bot = bots[k]
+      if k != 0:
         login(br, bot)
 
       # Fetch bankroll
       salt = int(prefix(br.find_element_by_id('balance').text, '<') \
                  .translate({ord(c): None for c in ','}))
-      bot.hist += [(salt, datetime.now())]
 
-      # Place bet
+      # Log last bet
+      if psalt[k] != -1:
+        win = salt > psalt[k]
+        bot.hist += [tuple(match + [psalt[k], win])]
+        dump(bots, open('salt.dat', 'wb'))
+      psalt[k] = salt
+
+      # Write bet amount
       bet = bot.betfn(mode, salt, chars)
       while True:
         try:
@@ -104,6 +98,7 @@ while True:
         except Exception as e:
           pass
 
+      # Place bet
       while search(br.page_source, 'redtext">\u2190') == '' and \
             search(br.page_source, 'bluetext">\u2192') == '':
         bname = 'player1' if bet[0] == 'r' else 'player2'
@@ -117,13 +112,27 @@ while True:
       # Logout
       br.get(url_logout)
 
-    # Write bet data
-    dump(bots, open('salt.dat', 'wb'))
-
     # Wait until bets close
     login(br, bots[0])
     while search(br.page_source, 'Bets are OPEN!') != '':
-      wait()
+      wait(br)
+
+    # Collect odds
+    while br.find_element_by_id('odds').text == '':
+      wait(br)
+    t = search(br.find_element_by_id('odds').text, '$') + ' '
+    rstr, i = '', 0
+    while t[i] != ' ':
+      if t[i].isdigit():
+        rstr += t[i]
+      i += 1
+    t = search(t[1:], '$')
+    bstr, i = '', 0
+    while t[i] != ' ':
+      if t[i].isdigit():
+        bstr += t[i]
+      i += 1
+    match = [datetime.now(), chars, (int(rstr), int(bstr))]
 
   # Terminate and reopen browser
   except Exception as e:
