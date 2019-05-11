@@ -1,3 +1,5 @@
 # File exclusion
 \#*\#
 *~
+*.pyc
+__pycache__
