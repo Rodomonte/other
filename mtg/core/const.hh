@@ -64,9 +64,9 @@ vec<str>
 
 void init(){
   int i;
-  char* basic = "WUKRG";
+  const char* basic = "WUKRG";
   for(i = 0; i < 5; ++i)
-    COSTS.pb(str(basic[i]));
+    COSTS.pb(str("" + basic[i]));
   //! COSTS.pb(
 }
 

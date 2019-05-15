@@ -27,27 +27,27 @@ struct Deck {
 
   }
 
-  str string(){
-    int i;
-    map<string, int> m;
-    map<string, int>::iterator it;
+  // str string(){
+  //   int i;
+  //   map<string, int> m;
+  //   map<string, int>::iterator it;
 
-    for(i = 0; i < main.size(); ++i){
-      if((it = m.find(main[i].name)) == m.end())
-        m[main[i].name] = 1;
-      else ++it->second;
-    }
+  //   for(i = 0; i < main.size(); ++i){
+  //     if((it = m.find(main[i].name)) == m.end())
+  //       m[main[i].name] = 1;
+  //     else ++it->second;
+  //   }
 
-    printf("%s:\n", name.c_str());
-    for(i = 0; i < main.size(); ++i)
-      printf("%dx %s\n", m[main[i].name], main[i].string().c_str());
-  }
+  //   printf("%s:\n", name.c_str());
+  //   for(i = 0; i < main.size(); ++i)
+  //     printf("%dx %s\n", m[main[i].name], main[i].string().c_str());
+  // }
 
-  void to_file(){
-    FILE* fp;
-    fp = fopen(file().c_str(), "w");
-    //fprintf(
-  }
+  // void to_file(){
+  //   FILE* fp;
+  //   fp = fopen(file().c_str(), "w");
+  //   //fprintf(
+  // }
 };
 
 

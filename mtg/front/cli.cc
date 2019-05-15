@@ -1,5 +1,6 @@
 // MAIN
 
+#include "load.hh"
 #include "create.hh"
 #include "sim.hh"
 #include "update.hh"
@@ -16,7 +17,7 @@ int main(){
   while(1){
     opt = -1;
     while(opt < 0 || opt > 4){
-      printf("%s", MAIN_OPTS);
+      printf("%s", MAIN_OPTS.c_str());
       try{ scanf("%d", &opt); }catch(...){}
     }
 

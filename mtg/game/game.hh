@@ -3,8 +3,8 @@
 #ifndef game_hh
 #define game_hh
 
+#include "deck.hh"
 #include "bot.hh"
-#include "log.hh"
 
 
 vec<Card> lib;
@@ -15,13 +15,13 @@ struct Game {
   int                   id, np, cp, turn;
   Format                format;
   vec<int>              life;
-  vec<Bot>              bot;
-  vec<Deck>             deck;
+  vec<Bot>              bots;
+  vec<Deck>             decks;
   vec<umap<str, int> >  counters;
-  vec<umap<str, Card> > hand, field, grave, exile;
+  vec<umap<str, Card> > hands, field, grave, exile;
 
   Game(){}
-  Game(Format _format, vec<Bot>& _bots, vd& _decks):
+  Game(Format _format, vec<Bot>& _bots, vec<Deck>& _decks):
       format(_format), bots(_bots), decks(_decks) {}
 
   str to_str(){
@@ -46,12 +46,12 @@ struct Game {
     return n >= np-1;
   }
 
-  stat draw(vd& d, umap<str, Card> m, int n){
+  stat draw(Deck& d, umap<str, Card> m, int n){
     int i;
     for(i = 0; i < n; ++i){
-      if(!d.empty())
+      //if(!d.empty())
     }
-    return 0;
+    return PASS;
   }
 
   stat init(){
@@ -59,30 +59,30 @@ struct Game {
     np = bots.size();
     turn = 0;
     for(i = 0; i < np; ++i)
-      life.pb((type == EDH) ? 40 : 20);
-    check(init_log());
+      life.pb((format == EDH) ? 40 : 20);
+    //check(init_log());
 
     cp = rand() % np;
     for(i = 0; i < np; ++i)
-      check(draw(deck[i], hand[i], 7));
+      check(draw(decks[i], hands[i], 7));
 
-    return 0;
+    return PASS;
   }
 
   stat step(){
 
     //! write file
-    return 0;
+    return PASS;
   }
 
   stat run(){
     check(init());
     while(1){
       check(step());
-      check(log(to_str()));
+      //check(log(to_str()));
       if(done()) break;
     }
-    return 0;
+    return PASS;
   }
 };
 

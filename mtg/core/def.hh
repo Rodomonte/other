@@ -3,17 +3,23 @@
 #ifndef def_hh
 #define def_hh
 
-#include "ncl.hh"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
 
 
 #define ll   long long
-#define str  string
+#define str  std::string
 
-#define vec  vector
+#define vec  std::vector
 #define pb   push_back
 
-#define uset unordered_set
-#define umap unordered_map
+#define uset std::unordered_set
+#define umap std::unordered_map
 
 
 #endif

@@ -7,7 +7,7 @@
 
 
 stat view_lib(vec<Card>& lib){
-  check(parse());
+  //check(parse());
   printf("Loading card library..\n");
   // if lib.map DNE, run parse
 

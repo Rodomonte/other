@@ -3,7 +3,7 @@
 #ifndef sim_hh
 #define sim_hh
 
-//#include "game.hh"
+#include "../game/game.hh"
 #include "select.hh"
 
 
@@ -27,24 +27,25 @@ struct Sim {
              "  >");
       try{ scanf("%d", &opt); }catch(...){}
     }
+    if(!opt) kill();
+    if(opt == 1) return BACK;
 
-    check(opt);
-    format = (opt == 2) ? EDH : MODERN;
-    check(pick_decks(format, decks));
-    check(pick_bots(bots));
+    format = (opt == 2) ? EDH : MOD;
+    check(select_decks(format, decks));
+    check(select_bots(bots));
     game = Game(format, bots, decks);
-    return 0;
+    return PASS;
   }
 
   stat play(vec<Deck>& decks){
     check(init());
     check(game.run());
-    return 0;
+    return PASS;
   }
 
   stat sim(vec<Deck>& decks){
 
-    return 0;
+    return PASS;
   }
 };
 

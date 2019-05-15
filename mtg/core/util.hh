@@ -25,17 +25,14 @@ enum stat {
 
 void check(stat s){ if(s == KILL) kill(); }
 
-stat call(str& cmd){
+stat call(const char* cmd){
   int r;
-  r = system(cmd.c_str());
+  r = system(cmd);
   return (WIFEXITED(r) && !WEXITSTATUS(r)) ? PASS : KILL;
 }
 
-bool in(str& s, vec<str>& v){
-  int i;
-  for(i = 0; i < v.size(); ++i)
-    if(v[i] == s) return true;
-  return false;
+bool in(str& s, uset<str>& u){
+  return u.find(s) != u.end();
 }
 
 

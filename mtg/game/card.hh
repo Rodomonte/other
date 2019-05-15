@@ -15,8 +15,8 @@ struct Card {
   umap<Cost, int> cost;
   umap<str, int>  counters;
 
-  Card(str& _name, int _pow, int _tuf, uset<str>& _types, uset<str>& _quals,
-       umap<Cost, int>& _cost): name(name), pow(_pow), tuf(_tuf),
+  Card(str& _name, int _bpow, int _btuf, uset<str>& _types, uset<str>& _quals,
+       umap<Cost, int>& _cost): name(name), bpow(_bpow), btuf(_btuf),
        types(_types), quals(_quals), cost(_cost) {}
 
   str string(){
@@ -28,7 +28,13 @@ struct Card {
     return str(buf);
   }
 
-  int cmc(){ return mw + mu + mk + mr + mg + mc + ma; }
+  int cmc(){
+    int n;
+    umap<Cost, int>::iterator it;
+    for(it = cost.begin(), n = 0; it != cost.end(); ++it)
+      n += it->second;
+    return n;
+  }
 
   int pow(Game& g){
     int n;
@@ -49,9 +55,10 @@ struct Card {
   }
 
   bool perm(){
-    return in(ART, types) || in(CRE, types) || in(ENC, types) || in(LAN, types);
+    return in(TYPES[ART], types) || in(TYPES[CRE], types) ||
+           in(TYPES[ENC], types) || in(TYPES[LAN], types);
   }
-  bool nlperm(){ return perm() && !in(LAN, types); }
+  bool nlperm(){ return perm() && !in(TYPES[LAN], types); }
 
   stat load(int id){
     return PASS;

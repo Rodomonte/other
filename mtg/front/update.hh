@@ -12,7 +12,7 @@ stat update_lib(vec<Card>& lib){
   check(call("python3 pull.py"));
   printf("Generating card objects..\n");
   //check(parse(lib));
-  return 0;
+  return PASS;
 }
 
 
