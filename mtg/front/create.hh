@@ -3,17 +3,17 @@
 #ifndef create_hh
 #define create_hh
 
-#include "../core/util.hh"
+#include "../game/card.hh"
 
 
 stat create_card(){
 
-  return 0;
+  return PASS;
 }
 
 stat create_deck(vec<Card>& lib){
 
-  return 0;
+  return PASS;
 }
 
 

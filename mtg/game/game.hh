@@ -7,6 +7,10 @@
 #include "log.hh"
 
 
+vec<Card> lib;
+vec<Deck> decks;
+
+
 struct Game {
   int                   id, np, cp, turn;
   Format                format;

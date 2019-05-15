@@ -11,7 +11,7 @@ const str
 , LIB_DIR   = "obj/lib"
 , DECKS_DIR = "obj/decks"
 
-, LIB_JSON  = LIB_DIR.join("lib.json")
+, LIB_JSON  = LIB_DIR + "/lib.json"
 
 , MAIN_OPTS =
     "(0) Exit\n"
@@ -42,39 +42,33 @@ const str
 ;
 
 
-enum Format { EDH, DRA, MOD, SEA, STA, THG };
-map<Format, str>
-  FORMATS
-{ {DRA, "Draft"}
-, {EDH, "Commander"}
-, {MOD, "Modern"}
-, {SEA, "Sealed"}
-, {STA, "Standard"}
-, {THG, "Two-Headed Giant"}
-}
+enum Cost
+{ WHI, BLU, BLA, RED, GRE, COL, GEN, X, SNO, WHIBLU, WHIBLA, WHIRED, WHIGRE,
+  BLUBLA, BLURED, BLUGRE, BLARED, BLAGRE, REDGRE, WHIGEN2, BLUGEN2, BLAGEN2,
+  REDGEN2, GREGEN2, PHYWHI, PHYBLU, PHYBLA, PHYRED, PHYGRE };
+enum Format
+{ EDH, DRA, MOD, SEA, STA, THG };
+enum Type
+{ ART, BAS, CRE, ENC, INS, LAN, LEG, PLA, SOR };
 
+vec<str>
+  COSTS
+, FORMATS
+{ "Draft", "Commander", "Modern", "Sealed", "Standard", "Two-Headed Giant" }
+, TYPES
+{ "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land",
+  "Legendary", "Planeswalker", "Sorcery" }
 , DECK_DIRS
-{ {DRA, DECKS_DIR+"/lim"}
-, {EDH, DECKS_DIR+"/edh"}
-, {MOD, DECKS_DIR+"/mod"}
-, {SEA, DECKS_DIR+"/lim"}
-, {STA, DECKS_DIR+"/sta"}
-, {THG, DECKS_DIR+"/thg"}
-};
+{ DECKS_DIR+"/lim", DECKS_DIR+"/edh", DECKS_DIR+"/mod", DECKS_DIR+"/lim",
+  DECKS_DIR+"/sta", DECKS_DIR+"/thg" };
 
-enum Type { ART, BAS, CRE, ENC, INS, LAN, LEG, PLA, SOR };
-map<Type, str>
-  TYPES
-{ {ART, "Artifact"}
-, {BAS, "Basic"}
-, {CRE, "Creature"}
-, {ENC, "Enchantment"}
-, {INS, "Instant"}
-, {LAN, "Land"}
-, {LEG, "Legendary"}
-, {PLA, "Planeswalker"}
-, {SOR, "Sorcery"}
-};
+void init(){
+  int i;
+  char* basic = "WUKRG";
+  for(i = 0; i < 5; ++i)
+    COSTS.pb(str(basic[i]));
+  //! COSTS.pb(
+}
 
 
 #endif

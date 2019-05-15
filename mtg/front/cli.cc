@@ -9,6 +9,7 @@
 int main(){
   int opt;
 
+  init();
   load_lib(lib);
   load_decks(decks);
 

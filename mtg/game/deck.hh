@@ -16,7 +16,7 @@ struct Deck {
   Deck(vec<Card> _main, vec<Card> _side, vec<Card> _extra):
     main(_main), side(_side), extra(_extra) {}
 
-  str file(){ return str(sprintf("%s/d%4d.deck", DECK_DIRS[format], id)); }
+  //str file(){ return str(sprintf(_, "%s/d%4d.deck", DECK_DIRS[format], id)); }
 
   void from_str(str& s){
 
@@ -27,7 +27,7 @@ struct Deck {
 
   }
 
-  str to_str(){
+  str string(){
     int i;
     map<string, int> m;
     map<string, int>::iterator it;
@@ -40,9 +40,7 @@ struct Deck {
 
     printf("%s:\n", name.c_str());
     for(i = 0; i < main.size(); ++i)
-      printf("%dx ", m[main[i].name]);
-      main[i].print();
-      printf("\n");
+      printf("%dx %s\n", m[main[i].name], main[i].string().c_str());
   }
 
   void to_file(){
