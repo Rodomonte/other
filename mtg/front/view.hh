@@ -3,14 +3,17 @@
 #ifndef view_hh
 #define view_hh
 
+#include "../obj/parse.hh"
 #include "../game/deck.hh"
 
 
 stat view_lib(vec<Card>& lib){
-  //check(parse());
-  printf("Loading card library..\n");
-  // if lib.map DNE, run parse
-
+  int i;
+  check(parse(lib));
+  printf("\nLIBRARY:\n");
+  for(i = 0; i < lib.size(); ++i)
+    printf("%s\n", lib[i].string().c_str());
+  printf("\n");
   return PASS;
 }
 

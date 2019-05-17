@@ -6,7 +6,7 @@
 #include "const.hh"
 
 
-char buf[1048576]
+char buf[64000000]
    , err[2048];
 
 
