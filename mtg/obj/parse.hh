@@ -14,7 +14,8 @@ str sss;
 str next(){
   int n;
   str s;
-  s = sss.substr(iii, sss.find(":")-iii);
+  iii = sss.find("\"", iii);
+  s = sss.substr(iii, sss.find(":", iii)-iii);
   iii = sss.find("{", iii)+1, n = 1;
   while(n){
     if(sss[iii] == '{') ++n;
@@ -25,9 +26,32 @@ str next(){
   return s;
 }
 
+umap<Cost, int> cost(str s){
+  umap<Cost, int> m;
+
+  return m;
+}
+
+Card fill(umap<str, str> m){
+  int i;
+  Card c;
+  vec<str> t;
+  c.name = m[name];
+  c.cost = cost(m["manaCost"]);
+  t = json2vec(m["types"]) + json2vec(m["subtypes"]);
+  for(i = 0; i < t.size(); ++i)
+    c.types.insert(t[i]);
+  c.quals.insert(m["text"]);
+  c.bpow = str2int(m["power"]);
+  c.btuf = str2int(m["toughness"]);
+  return c;
+}
+
+// JSON -> Card objects
 stat parse(vec<Card>& lib){
-  int n;
   FILE* fp;
+  int n;
+  str s;
 
   fp = fopen(lpath, "r");
   if(fp == NULL) printf(":(\n");
@@ -36,10 +60,9 @@ stat parse(vec<Card>& lib){
   fseek(fp, 0, SEEK_SET);
   fread(buf, sizeof(char), n, fp);
   fclose(fp);
-  sss = buf, iii = sss.find("\"");
-
-  printf("%s\n", next().c_str());
-
+  sss = buf, iii = 0;
+  while(sss.find("{", iii) != -1)
+    lib.pb(fill(json2umap(next())));
   return PASS;
 }
 

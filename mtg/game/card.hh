@@ -9,12 +9,13 @@
 struct Game;
 
 struct Card {
-  int             id, bpow, btuf;
+  int             bpow, btuf;
   str             name;
   uset<str>       types, quals;
   umap<Cost, int> cost;
   umap<str, int>  counters;
 
+  Card(){}
   Card(str& _name, int _bpow, int _btuf, uset<str>& _types, uset<str>& _quals,
        umap<Cost, int>& _cost): name(name), bpow(_bpow), btuf(_btuf),
        types(_types), quals(_quals), cost(_cost) {}

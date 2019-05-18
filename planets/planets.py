@@ -48,7 +48,7 @@ def datelt(a, b):
 # PARSE
 
 mb = []
-chdir('data/future')
+chdir('data')
 files = listdir('.')
 n = 0
 for fname in files:
@@ -88,7 +88,7 @@ for fname in files:
 
 # COLINEARITY
 
-ERR = 0.05
+ERR = 20000000 #0.05
 ERRM = 0.01
 TOP = 2000
 
