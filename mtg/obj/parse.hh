@@ -15,8 +15,7 @@ str next(){
   int n;
   str s;
   iii = sss.find("\"", iii);
-  s = sss.substr(iii, sss.find(":", iii)-iii);
-  iii = sss.find("{", iii)+1, n = 1;
+  iii = sss.find("{", iii)+1, s = "{", n = 1;
   while(n){
     if(sss[iii] == '{') ++n;
     else if(sss[iii] == '}') --n;
@@ -26,24 +25,31 @@ str next(){
   return s;
 }
 
-umap<Cost, int> cost(str s){
-  umap<Cost, int> m;
-
-  return m;
-}
-
 Card fill(umap<str, str> m){
-  int i;
+  int i,j;
+  str s,t;
   Card c;
-  vec<str> t;
-  c.name = m[name];
-  c.cost = cost(m["manaCost"]);
-  t = json2vec(m["types"]) + json2vec(m["subtypes"]);
-  for(i = 0; i < t.size(); ++i)
-    c.types.insert(t[i]);
+  vec<str> v;
+  umap<str, int>::iterator it;
+
+  c.name = m["name"];
+  s = m["manaCost"];
+  for(i = 0; i < s.size(); ++i)
+    if(s[i] == '{'){
+      for(j = i+1, t = ""; s[j] != '}'; ++j)
+        t.append(1, s[j]);
+      if(isnum(t)) c.cost["A"] = str2int(t);
+      else if((it = c.cost.find(t)) == c.cost.end()) c.cost[t] = 1;
+      else ++it->second;
+    }
+
+  v = json2vec(m["types"]) + json2vec(m["subtypes"]) +
+      json2vec(m["supertypes"]);
+  for(i = 0; i < v.size(); ++i)
+    c.types.insert(v[i]);
   c.quals.insert(m["text"]);
-  c.bpow = str2int(m["power"]);
-  c.btuf = str2int(m["toughness"]);
+  c.bpow = (m.find("power") == m.end()) ? 0 : str2int(m["power"]);
+  c.btuf = (m.find("toughness") == m.end()) ? 0 : str2int(m["toughness"]);
   return c;
 }
 
@@ -61,7 +67,7 @@ stat parse(vec<Card>& lib){
   fread(buf, sizeof(char), n, fp);
   fclose(fp);
   sss = buf, iii = 0;
-  while(sss.find("{", iii) != -1)
+  while(sss.find("{", iii) != str::npos)
     lib.pb(fill(json2umap(next())));
   return PASS;
 }

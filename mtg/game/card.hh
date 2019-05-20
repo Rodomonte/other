@@ -9,29 +9,35 @@
 struct Game;
 
 struct Card {
-  int             bpow, btuf;
-  str             name;
-  uset<str>       types, quals;
-  umap<Cost, int> cost;
-  umap<str, int>  counters;
+  int            bpow, btuf;
+  str            name;
+  uset<str>      types, quals;
+  umap<str, int> cost, counters;
 
   Card(){}
   Card(str& _name, int _bpow, int _btuf, uset<str>& _types, uset<str>& _quals,
-       umap<Cost, int>& _cost): name(name), bpow(_bpow), btuf(_btuf),
+       umap<str, int>& _cost): name(name), bpow(_bpow), btuf(_btuf),
        types(_types), quals(_quals), cost(_cost) {}
 
   str string(){
     int i;
-    umap<Cost, int>::iterator it;
+    umap<str, int>::iterator it;
     sprintf(buf, "%s (", name.c_str());
     for(i = 0; buf[i] != '('; ++i);
-    //! for(it = COSTS
+    for(it = cost.begin(); it != cost.end(); ++it){
+      sprintf(buf+i+1, "%d%s ", it->second, it->first.c_str());
+      ++i;
+      while(buf[i] != ' ') ++i;
+    }
+    sprintf(buf+i+1, ") "), i += 2;
+    if(types.find("Creature") != types.end())
+      sprintf(buf+i+1, "%d/%d ", bpow, btuf);
     return str(buf);
   }
 
   int cmc(){
     int n;
-    umap<Cost, int>::iterator it;
+    umap<str, int>::iterator it;
     for(it = cost.begin(), n = 0; it != cost.end(); ++it)
       n += it->second;
     return n;

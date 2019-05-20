@@ -42,6 +42,13 @@ vec<T> operator+(const vec<T>& a, const vec<T>& b){
   return v;
 }
 
+bool isnum(str s){
+  int i,d;
+  for(i = 0; i < s.size(); ++i)
+    if(s[i] < '0' || s[i] > '9') return false;
+  return true;
+}
+
 int str2int(str s){
   char c,f;
   int i,n;
@@ -53,14 +60,36 @@ int str2int(str s){
 }
 
 vec<str> json2vec(str s){
+  int i,j;
   vec<str> v;
-
+  i = j = 0;
+  while(1){
+    i = s.find("\"", j+1);
+    if(i == str::npos) break;
+    j = s.find("\"", i+1);
+    if(j == str::npos) break;
+    v.pb(s.substr(i+1, j));
+  }
   return v;
 }
 
 umap<str, str> json2umap(str s){
+  int i,j;
+  str k;
   umap<str, str> m;
-
+  i = j = 0;
+  while(1){
+    i = s.find("\"", j+1);
+    if(i == str::npos) break;
+    j = s.find("\"", i+1);
+    if(j == str::npos) break;
+    k = s.substr(i+1, j-i-1);
+    i = j+3;
+    if(s[i] == '"') j = s.find("\"", i+1), ++i;
+    else if(s[i] == '[') j = s.find("]", i+1);
+    else continue;
+    m[k] = s.substr(i, j-i);
+  }
   return m;
 }
 
