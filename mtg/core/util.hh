@@ -35,6 +35,13 @@ bool in(str& s, uset<str>& u){
   return u.find(s) != u.end();
 }
 
+str replace(str s, str t, str n){
+  int i;
+  while((i = s.find(t)) != str::npos)
+    s = s.substr(0, i) + n + s.substr(i+t.size(), s.size()-i-t.size());
+  return s;
+}
+
 template <typename T>
 vec<T> operator+(const vec<T>& a, const vec<T>& b){
   vec<T> v(a);
@@ -68,25 +75,31 @@ vec<str> json2vec(str s){
     if(i == str::npos) break;
     j = s.find("\"", i+1);
     if(j == str::npos) break;
-    v.pb(s.substr(i+1, j));
+    v.pb(s.substr(i+1, j-i-1));
   }
   return v;
 }
 
 umap<str, str> json2umap(str s){
-  int i,j;
+  int i,j,t;
   str k;
   umap<str, str> m;
   i = j = 0;
   while(1){
     i = s.find("\"", j+1);
-    if(i == str::npos) break;
+    if(i == str::npos) return m;
     j = s.find("\"", i+1);
-    if(j == str::npos) break;
+    if(j == str::npos) return m;
     k = s.substr(i+1, j-i-1);
-    i = j+3;
-    if(s[i] == '"') j = s.find("\"", i+1), ++i;
-    else if(s[i] == '[') j = s.find("]", i+1);
+    i = j+3, t = i+1;
+    if(s[i] == '"'){
+      while(1){
+        j = s.find("\"", t);
+        if(s[j-1] != '\\') break;
+        t = j+1;
+      }
+      ++i;
+    }else if(s[i] == '[') j = s.find("]", i+1);
     else continue;
     m[k] = s.substr(i, j-i);
   }

@@ -9,7 +9,6 @@
 int main(){
   int opt;
 
-  init();
   while(1){
     opt = -1;
     while(opt < 0 || opt > 4){

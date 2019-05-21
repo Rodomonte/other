@@ -21,7 +21,9 @@ struct Card {
 
   str string(){
     int i;
+    uset<str>::iterator jt;
     umap<str, int>::iterator it;
+
     sprintf(buf, "%s (", name.c_str());
     for(i = 0; buf[i] != '('; ++i);
     for(it = cost.begin(); it != cost.end(); ++it){
@@ -30,8 +32,25 @@ struct Card {
       while(buf[i] != ' ') ++i;
     }
     sprintf(buf+i+1, ") "), i += 2;
-    if(types.find("Creature") != types.end())
+
+    if(types.find("Creature") != types.end()){
       sprintf(buf+i+1, "%d/%d ", bpow, btuf);
+      ++i;
+      while(buf[i] != ' ') ++i;
+    }
+
+    for(jt = types.begin(); jt != types.end(); ++jt){
+      sprintf(buf+i+1, "%s ", jt->c_str());
+      ++i;
+      while(buf[i] != ' ') ++i;
+    }
+
+    for(jt = QUALS.begin(); jt != QUALS.end(); ++jt)
+      if(quals.find(*jt) != quals.end()){
+        sprintf(buf+i+1, "- %s -", jt->c_str());
+        i += 3;
+        while(buf[i] != '-') ++i;
+      }
     return str(buf);
   }
 

@@ -39,23 +39,19 @@ enum Type
 { ART, BAS, CRE, ENC, INS, LAN, LEG, PLA, SOR };
 
 vec<str>
-  COSTS
-, FORMATS
+  FORMATS
 { "Draft", "Commander", "Modern", "Sealed", "Standard", "Two-Headed Giant" }
 , TYPES
-{ "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land",
-  "Legendary", "Planeswalker", "Sorcery" }
+{ "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land"
+, "Legendary", "Planeswalker", "Sorcery" }
 , DECK_DIRS
-{ DECKS_DIR+"/lim", DECKS_DIR+"/edh", DECKS_DIR+"/mod", DECKS_DIR+"/lim",
-  DECKS_DIR+"/sta", DECKS_DIR+"/thg" };
+{ DECKS_DIR+"/lim", DECKS_DIR+"/edh", DECKS_DIR+"/mod", DECKS_DIR+"/lim"
+, DECKS_DIR+"/sta", DECKS_DIR+"/thg" };
 
-void init(){
-  int i;
-  const char* basic = "WUKRG";
-  for(i = 0; i < 5; ++i)
-    COSTS.pb(str("" + basic[i]));
-  //! COSTS.pb(
-}
+uset<str>
+  QUALS
+{ "Trample", "Flying", "Deathtouch", "Reach", "Vigilance", "Indestructible"
+, "Menace", "Lifelink", "Defender", "Delve", "Investigate"};
 
 
 #endif
