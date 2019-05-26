@@ -6,9 +6,6 @@
 #include "def.hh"
 
 
-vec<Card> lib;
-vec<Deck> decks;
-
 const str
   BOTS_DIR  = "obj/bots"
 , LIB_DIR   = "obj/lib"
@@ -33,6 +30,8 @@ const str
     "(2)   Ready\n"
     "(3 #) View\n"
     "  > "
+
+, COLORS = "WUBRG";
 ;
 
 
@@ -41,9 +40,13 @@ enum Format
 enum Type
 { ART, BAS, CRE, ENC, INS, LAN, LEG, PLA, SOR };
 
+vec<int>
+  DECK_SIZES
+{ 100, 40, 60, 40, 60, 40 };
+
 vec<str>
   FORMATS
-{ "Draft", "Commander", "Modern", "Sealed", "Standard", "Two-Headed Giant" }
+{ "Commander", "Draft", "Modern", "Sealed", "Standard", "Two-Headed Giant" }
 , TYPES
 { "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land"
 , "Legendary", "Planeswalker", "Sorcery" }

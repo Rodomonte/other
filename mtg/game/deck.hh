@@ -12,15 +12,19 @@ struct Deck {
   str       name;
   vec<Card> main, side, extra;
 
+  Deck(){}
   Deck(int _id, Format _format): id(_id), format(_format) {}
   Deck(vec<Card> _main, vec<Card> _side, vec<Card> _extra):
     main(_main), side(_side), extra(_extra) {}
 
-  //str file(){ return str(sprintf(_, "%s/d%4d.deck", DECK_DIRS[format], id)); }
-
-  void from_str(str& s){
-
+  void shuffle(){
+    int i,j;
+    Card c;
+    for(i = main.size()-1; i > 0; --i)
+      j = rand()%(i+1), c = main[i], main[i] = main[j], main[j] = c;
   }
+
+  //str file(){ return str(sprintf(_, "%s/d%4d.deck", DECK_DIRS[format], id)); }
 
   void from_file(){
     str s;
@@ -49,6 +53,8 @@ struct Deck {
   //   //fprintf(
   // }
 };
+
+vec<Deck> deck_lib;
 
 
 #endif

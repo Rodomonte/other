@@ -37,13 +37,13 @@ struct Sim {
     return PASS;
   }
 
-  stat play(vec<Deck>& decks){
+  stat play(){
     check(init());
     check(game.run());
     return PASS;
   }
 
-  stat sim(vec<Deck>& decks){
+  stat sim(){
 
     return PASS;
   }

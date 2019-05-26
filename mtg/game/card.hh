@@ -95,5 +95,7 @@ struct Card {
   }
 };
 
+umap<str, Card> card_lib;
+
 
 #endif

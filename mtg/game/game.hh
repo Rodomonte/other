@@ -17,9 +17,9 @@ struct Game {
 
   Game(){}
   Game(Format _format, vec<Bot>& _bots, vec<Deck>& _decks):
-      format(_format), bots(_bots), decks(_decks) {}
+      format(_format), bots(_bots), decks(_decks) { init(); }
 
-  str to_str(){
+  str string(){
     int i;
     str s;
     //! sprintf(buf, ..
@@ -37,8 +37,8 @@ struct Game {
 
   bool done(){
     int i, n;
-    for(i = n = 0; i < np; ++i) if(!life[i]) n += 1;
-    return n >= np-1;
+    for(i = n = 0; i < life.size(); ++i) if(!life[i]) n += 1;
+    return n >= life.size()-1;
   }
 
   stat draw(Deck& d, umap<str, Card> m, int n){
@@ -51,14 +51,13 @@ struct Game {
 
   stat init(){
     int i;
-    np = bots.size();
     turn = 0;
-    for(i = 0; i < np; ++i)
+    for(i = 0; i < decks.size(); ++i)
       life.pb((format == EDH) ? 40 : 20);
     //check(init_log());
 
-    cp = rand() % np;
-    for(i = 0; i < np; ++i)
+    cp = rand() % life.size();
+    for(i = 0; i < life.size(); ++i)
       check(draw(decks[i], hands[i], 7));
 
     return PASS;

@@ -7,7 +7,7 @@
 //#include "../obj/parse.hh"
 
 
-stat update_lib(vec<Card>& lib){
+stat update_lib(){
   printf("Pulling data from web..\n");
   check(call("python3 pull.py"));
   printf("Generating card objects..\n");

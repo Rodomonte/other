@@ -67,10 +67,11 @@ str next(){
 }
 
 // JSON -> Card objects
-stat parse(vec<Card>& lib){
+stat parse(){
   FILE* fp;
   int n;
   str s;
+  Card c;
 
   fp = fopen(lpath, "r");
   if(fp == NULL) printf(":(\n");
@@ -81,8 +82,10 @@ stat parse(vec<Card>& lib){
   fclose(fp);
 
   sss = buf, iii = 0;
-  while(sss.find("{", iii) != str::npos)
-    lib.pb(fill(json2umap(next())));
+  while(sss.find("{", iii) != str::npos){
+    c = fill(json2umap(next()));
+    card_lib[c.name] = c;
+  }
   return PASS;
 }
 
