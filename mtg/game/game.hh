@@ -7,17 +7,12 @@
 #include "bot.hh"
 
 
-vec<Card> lib;
-vec<Deck> decks;
-
-
 struct Game {
-  int                   id, np, cp, turn;
+  int                   cp, turn;
   Format                format;
   vec<int>              life;
   vec<Bot>              bots;
   vec<Deck>             decks;
-  vec<umap<str, int> >  counters;
   vec<umap<str, Card> > hands, field, grave, exile;
 
   Game(){}

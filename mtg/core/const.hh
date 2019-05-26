@@ -6,6 +6,9 @@
 #include "def.hh"
 
 
+vec<Card> lib;
+vec<Deck> decks;
+
 const str
   BOTS_DIR  = "obj/bots"
 , LIB_DIR   = "obj/lib"
@@ -51,7 +54,8 @@ vec<str>
 uset<str>
   QUALS
 { "Trample", "Flying", "Deathtouch", "Reach", "Vigilance", "Indestructible"
-, "Menace", "Lifelink", "Defender", "Delve", "Investigate"};
+, "Menace", "Lifelink", "Defender", "Delve", "Investigate", "First strike"
+, "Double strike", "Ingest", "Haste", "Flash", "Hexproof", "Prowess"};
 
 
 #endif
