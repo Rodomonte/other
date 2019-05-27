@@ -7,15 +7,17 @@
 
 
 stat create_card(){
-
+  //!
   return PASS;
 }
 
 stat create_deck(){
   char f;
-  int i,j,k,ii;
-  vec<char> scheme;
+  int i,j,k;
+  uset<char> scheme;
   umap<str, Card>::iterator it;
+  umap<str, int>::iterator jt;
+  uset<char>::iterator kt;
   Deck d;
 
   // Determine colors
@@ -23,36 +25,48 @@ stat create_deck(){
   for(j = 0; j < i; ++j){
     while(1){
       k = rand() % 5, f = 1;
-      for(ii = 0; ii < scheme.size(); ++ii)
-        if(scheme[ii] == COLORS[k]){ f = 0; break; }
+      for(kt = scheme.begin(); kt != scheme.end(); ++kt)
+        if(*kt == COLORS[k]){ f = 0; break; }
       if(f) break;
     }
-    scheme.pb(COLORS[k]);
+    scheme.insert(COLORS[k]);
   }
 
   //! Determine format
   d.format = MOD;
 
-  // Add lands
-  i = 0;
+  // Add basic lands
+  kt = scheme.begin();
   while((double)d.main.size() / DECK_SIZES[d.format] < 0.42){
-    switch(scheme[i]){
+    if(kt == scheme.end()) kt = scheme.begin();
+    switch(*kt){
       case 'W': d.main.pb(card_lib["Plains"]);   break;
       case 'U': d.main.pb(card_lib["Island"]);   break;
       case 'B': d.main.pb(card_lib["Swamp"]);    break;
       case 'R': d.main.pb(card_lib["Mountain"]); break;
       case 'G': d.main.pb(card_lib["Forest"]);   break;
     }
-    i = (i == scheme.size()-1) ? 0 : i+1;
+    ++kt;
   }
-
-  printf("%d / %d\n", d.main.size(), DECK_SIZES[d.format]);
 
   // Add random creatures
   while(d.main.size() < DECK_SIZES[d.format]){
-    it = std::next(card_lib.begin(), rand() % card_lib.size());
-    //! filter
+    it = std::next(card_lib.begin(), rand() % card_lib.size()), f = 1;
+    Card& c(it->second);
+    for(jt = c.cost.begin(); jt != c.cost.end(); ++jt)
+      if((jt->first.size() == 1 &&
+          scheme.find(jt->first.at(0)) == scheme.end()) ||
+         (jt->first.size() == 3 && scheme.find(jt->first.at(0)) == scheme.end()
+          && scheme.find(jt->first.at(2)) == scheme.end())){
+        f = 0; break; }
+    if(!f || c.types.find("Creature") == c.types.end()) continue;
+    d.main.pb(c);
   }
+
+  // Generate name
+  for(i = 0; i < 16; ++i)
+    d.name.append(1, (char)(rand() % 26) + 'a');
+  deck_lib.pb(d);
 
   return PASS;
 }

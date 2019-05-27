@@ -14,7 +14,7 @@ int main(){
   while(1){
     opt = -1;
     while(opt < 0 || opt > 7){
-      printf("%s", MAIN_OPTS.c_str());
+      printf("\n%s", MAIN_OPTS.c_str());
       try{ scanf("%d", &opt); }catch(...){}
     }
 
