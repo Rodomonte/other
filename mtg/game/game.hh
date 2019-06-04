@@ -7,17 +7,23 @@
 #include "bot.hh"
 
 
+struct MultiCard {
+  int n;
+  Card c;
+  MultiCard(Card& _c): c(_c), n(1) {}
+};
+
 struct Game {
-  int                   cp, turn;
-  Format                format;
-  vec<int>              life;
-  vec<Bot>              bots;
-  vec<Deck>             decks;
-  vec<umap<str, Card> > hands, field, grave, exile;
+  int       cp, turn;
+  Format    format;
+  vec<int>  life;
+  vec<Bot>  bot;
+  vec<Deck> deck;
+  vec<umap<str, MultiCard> > hand, field, grave, exile;
 
   Game(){}
-  Game(Format _format, vec<Bot>& _bots, vec<Deck>& _decks):
-      format(_format), bots(_bots), decks(_decks) { init(); }
+  Game(Format _format, vec<Bot>& _bot, vec<Deck>& _deck):
+      format(_format), bot(_bot), deck(_deck) { init(); }
 
   str string(){
     int i;
@@ -52,13 +58,13 @@ struct Game {
   stat init(){
     int i;
     turn = 0;
-    for(i = 0; i < decks.size(); ++i)
+    for(i = 0; i < deck.size(); ++i)
       life.pb((format == EDH) ? 40 : 20);
     //check(init_log());
 
     cp = rand() % life.size();
     for(i = 0; i < life.size(); ++i)
-      check(draw(decks[i], hands[i], 7));
+      check(draw(deck[i], hand[i], 7));
 
     return PASS;
   }

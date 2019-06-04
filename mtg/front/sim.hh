@@ -4,7 +4,7 @@
 #define sim_hh
 
 #include "../game/game.hh"
-#include "select.hh"
+#include "create.hh"
 
 
 struct Sim {
@@ -18,21 +18,29 @@ struct Sim {
     vec<Bot>  bots;
     vec<Deck> decks;
 
-    opt = -1;
-    while(opt < 0 || opt > 3){
-      printf("(0) Exit\n"
-             "(1) Back\n"
-             "(2) EDH\n"
-             "(3) Modern\n"
-             "  >");
-      try{ scanf("%d", &opt); }catch(...){}
-    }
-    if(!opt) kill();
-    if(opt == 1) return BACK;
+    // opt = -1;
+    // while(opt < 0 || opt > 3){
+    //   printf("%s", SIM_OPTS);
+    //   try{ scanf("%d", &opt); }catch(...){}
+    // }
 
-    format = (opt == 2) ? EDH : MOD;
-    check(select_decks(format, decks));
-    check(select_bots(bots));
+    // switch(opt){
+    //   case 0: return KILL;  break;
+    //   case 1: return BACK;  break;
+    //   case 2: format = EDH; break;
+    //   case 3: format = MOD; break;
+    // }
+
+    format = MOD;
+
+    while(deck_lib.size() < 2)
+      create_deck();
+    decks.pb(deck_lib[0]);
+    decks.pb(deck_lib[1]);
+
+    bots.pb(Bot(true, 0));
+    bots.pb(Bot(true, 1));
+
     game = Game(format, bots, decks);
     return PASS;
   }

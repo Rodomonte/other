@@ -25,10 +25,10 @@ const str
     "  > "
 
 , SIM_OPTS =
-    "(0)   Exit\n"
-    "(1)   Back\n"
-    "(2)   Ready\n"
-    "(3 #) View\n"
+    "(0) Exit\n"
+    "(1) Back\n"
+    "(2) EDH\n"
+    "(3) Modern\n"
     "  > "
 
 , COLORS = "WUBRG";
