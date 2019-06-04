@@ -3,8 +3,8 @@
 #ifndef game_hh
 #define game_hh
 
-#include "deck.hh"
 #include "bot.hh"
+#include "deck.hh"
 
 
 struct MultiCard {
@@ -17,27 +17,36 @@ struct Game {
   int       cp, turn;
   Format    format;
   vec<int>  life;
-  vec<Bot>  bot;
+  vec<Bot*>  bot;
   vec<Deck> deck;
   vec<umap<str, MultiCard> > hand, field, grave, exile;
 
   Game(){}
-  Game(Format _format, vec<Bot>& _bot, vec<Deck>& _deck):
+  Game(Format _format, vec<Bot*>& _bot, vec<Deck>& _deck):
       format(_format), bot(_bot), deck(_deck) { init(); }
 
+  bool cost_sat(Card& c, int t){
+    //!
+    return false;
+  }
+
   str string(){
-    int i;
     str s;
-    //! sprintf(buf, ..
-    /* s = sprintf("{\"id\": %d, \"np\": %d, \"format\": %s, \"life\": [%d", */
-    /*             id, np, FORMATS[format].c_str(), life[0]); */
-    /* for(i = 1; i < life.size(); ++i) s += sprintf(", %d", life[i]); */
-    /* s += sprintf("], \"poison\": [%d", poison[0]); */
-    /* for(i = 1; i < poison.size(); ++i) s += sprintf(", %d", poison[i]); */
-    /* s += sprintf("], \"bots\": [%d", bots[0].id); */
-    /* for(i = 1; i < bots.size(); ++i) s += sprintf(", %d", bots[i].id); */
-    /* s += sprintf("], \"decks\": [%d", decks[0].id); */
-    /* for(i = 1; i < decks.size(); ++i) s += sprintf(", %d", decks[i].id); */
+    //!
+    return s;
+  }
+
+  str hand_string(int t){
+    str s = "Hand:\n";
+    umap<str, MultiCard>::iterator it;
+    for(it = hand[t].begin(); it != hand[t].end(); ++it){
+      if(/*!*/cost_sat(it->second.c, t)) s += "** ";
+      else s += "   ";
+      s += it->second.c.string();
+      if(it->second.n > 1)
+        s += " x", sprintf(buf, "%d", it->second.n), s += str(buf);
+      s += "\n";
+    }
     return s;
   }
 
@@ -47,7 +56,7 @@ struct Game {
     return n >= life.size()-1;
   }
 
-  stat draw(Deck& d, umap<str, Card> m, int n){
+  stat draw(Deck& d, umap<str, MultiCard>& m, int n){
     int i;
     for(i = 0; i < n; ++i){
       //if(!d.empty())

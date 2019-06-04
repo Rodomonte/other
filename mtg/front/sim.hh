@@ -3,19 +3,19 @@
 #ifndef sim_hh
 #define sim_hh
 
-#include "../game/game.hh"
+#include "../game/human.hh"
 #include "create.hh"
 
 
 struct Sim {
-  Game game;
+  Game g;
 
   Sim(){}
 
   stat init(){
     int       opt;
     Format    format;
-    vec<Bot>  bots;
+    vec<Bot*>  bots;
     vec<Deck> decks;
 
     // opt = -1;
@@ -38,16 +38,20 @@ struct Sim {
     decks.pb(deck_lib[0]);
     decks.pb(deck_lib[1]);
 
-    bots.pb(Bot(true, 0));
-    bots.pb(Bot(true, 1));
+    bots.pb(new Human(0));
+    bots.pb(new Human(1));
 
-    game = Game(format, bots, decks);
+    g = Game(format, bots, decks);
+
     return PASS;
   }
 
   stat play(){
     check(init());
-    check(game.run());
+    check(g.run());
+    //! log game
+    delete g.bot[0];
+    delete g.bot[1];
     return PASS;
   }
 
