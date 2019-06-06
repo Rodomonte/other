@@ -15,7 +15,7 @@ struct Sim {
   stat init(){
     int       opt;
     Format    format;
-    vec<Bot*>  bots;
+    vec<Bot*> bots;
     vec<Deck> decks;
 
     // opt = -1;
