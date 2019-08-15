@@ -3,15 +3,19 @@
 #include "tex.hh"
 //#include "dw.hh"
 
+
 int main(){
-  tex g;
   init();
 
-  g.sim(texhand({CA, SA}), texhand(), 9);
+  tex g;
+  // g.sim(texhand({CK, SK}), texhand(), 2);
 
-  // texhand h({SA, DA, HA, SQ, CJ, SK, CA});
-  // texhand s(h.kind(4));
-  // printf("%s\n", s.string().c_str());
+  int i;
+  vec<bot*> bots;
+  bots.pb(new human(1000));
+  for(i = 0; i < 8; ++i)
+    bots.pb(new bot0(1000));
+  g.play(bots);
 
   return 0;
 }

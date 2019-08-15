@@ -1,6 +1,6 @@
 // TEXAS HOLD EM
 
-#include "util.hh"
+#include "bot.hh"
 
 #define HN 5
 
@@ -8,6 +8,20 @@
 struct texhand : hand {
   texhand(){}
   texhand(vec<card> _h): hand(_h) {}
+
+  virtual str string(){
+    str r(hand::string());
+    if(!rf().empty()) r += " (Royal Flush)";
+    else if(!sf().empty()) r += " (Straight Flush)";
+    else if(!kind(4).empty()) r += " (Four of a Kind)";
+    else if(!fh().empty()) r += " (Full House)";
+    else if(!fl().empty()) r += " (Flush)";
+    else if(!st().empty()) r += " (Straight)";
+    else if(!kind(3).empty()) r += " (Three of a Kind)";
+    else if(!pair2().empty()) r += " (Two Pair)";
+    else if(!kind(2).empty()) r += " (Pair)";
+    return r;
+  }
 
   texhand hi(){
     texhand r(*this);
@@ -327,6 +341,50 @@ struct texhand : hand {
 
 
 struct tex {
+  void play(vec<bot*> bots){
+    int i,j,t;
+    texhand b;
+    deck d;
+
+    for(i = 0; i < bots.size(); ++i)
+      bots[i]->h = new texhand();
+    t = 0;
+
+    while(bots.size() > 1){
+      ++t;
+      printf("\nTURN %d:\n", t);
+      d = DECK, d.shuf(), b.clear();
+      for(j = 0; j < bots.size(); ++j)
+        bots[j]->h->clear();
+      for(i = 0; i < 2; ++i)
+        for(j = 0; j < bots.size(); ++j)
+          bots[j]->h->pb(d.draw());
+
+      //bet();
+
+      d.draw();
+      for(i = 0; i < 3; ++i)
+        b.pb(d.draw());
+      printf("FLOP: %s\n", b.string().c_str());
+
+      //bet();
+
+      d.draw();
+      b.pb(d.draw());
+      printf("TURN: %s\n", b.string().c_str());
+
+      //bet();
+
+      d.draw();
+      b.pb(d.draw());
+      printf("RIVER: %s\n", b.string().c_str());
+
+      //bet();
+
+
+    }
+  }
+
   // Given a 2-card hand, 0-5 card board, and number of players:
   // % chance of winning
   // % chance of getting certain hand

@@ -96,9 +96,10 @@ struct hand {
   int size(){ return h.size(); }
   bool empty(){ return !size(); }
   void clear(){ h.clear(); }
+  card& back(){ return h.back(); }
   card& operator[](int i){ return h[i]; }
 
-  str string(){
+  virtual str string(){
     int i;
     str r = "";
     for(i = 0; i < size()-1; ++i)
