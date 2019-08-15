@@ -17,12 +17,12 @@ struct texhand : hand {
     return r;
   }
 
-  //! Also return highest 3
   texhand kind(int n){
+    bool f;
     int i,j,k;
     texhand r;
     for(i = RN-1; i >= 0; --i){
-      for(j = k = 0; j < size(); ++j)
+      for(k = j = 0; j < size(); ++j)
         if(h[j].r == RANK[i]) ++k;
       if(k == n){
         for(j = 0; j < size(); ++j)
@@ -30,23 +30,35 @@ struct texhand : hand {
         break;
       }
     }
+    if(r.empty()) return r;
+    sort();
+    for(k = i = 0; i < size() && r.size() < HN; ++i){
+      for(f = true, j = 0; j < r.size(); ++j)
+        if(h[i].r == r[j].r){ f = false; break; }
+      if(f) r.pb(h[i]);
+    }
     return r;
   }
 
-  //! Also return highest
   texhand pair2(){
+    bool f;
     int i,j,k;
     texhand r;
     for(i = RN-1; i >= 0; --i){
       for(j = k = 0; j < size(); ++j)
         if(h[j].r == RANK[i]) ++k;
-      if(k == 2){
+      if(k == 2)
         for(j = 0; j < size(); ++j)
           if(h[j].r == RANK[i]) r.pb(h[j]);
-        if(r.size() == 4) return r;
-      }
+      if(r.size() == 4) break;
     }
-    if(r.size() == 2) r.clear();
+    if(r.size() < 4) return r;
+    sort();
+    for(i = 0; i < size(); ++i){
+      for(f = true, j = 0; j < r.size(); ++j)
+        if(h[i].r == r[j].r){ f = false; break; }
+      if(f){ r.pb(h[i]); break; }
+    }
     return r;
   }
 
@@ -70,14 +82,35 @@ struct texhand : hand {
   }
 
   texhand fl(){
+    int i,j,k;
     texhand r;
-
+    sort();
+    for(i = 0; i < SN; ++i){
+      for(k = j = 0; j < size(); ++j)
+        if(h[j].s == SUIT[i]) ++k;
+      if(k >= HN){
+        for(j = 0; j < size() && r.size() < HN; ++j)
+          if(h[j].s == SUIT[i]) r.pb(h[j]);
+        break;
+      }
+    }
     return r;
   }
 
   texhand fh(){
+    char a,b;
+    int i,j,k;
     texhand r;
-
+    if(kind(2).empty() || kind(3).empty()) return r;
+    sort(), a = b = 0;
+    for(i = 0; i < RN; ++i){
+      for(k = j = 0; j < size(); ++j)
+        if(h[j].r == RANK[i]) ++k;
+      if((!a && k == 3) || (!b && k == 2))
+        for(j = 0; j < size(); ++j)
+          if(h[j].r == RANK[i]) r.pb(h[j]);
+      if(a && b) break;
+    }
     return r;
   }
 
@@ -106,36 +139,35 @@ struct texhand : hand {
     return 0;
   }
 
-  // Full house compares its 3-kind first
-  int _cmpfh(texhand o){
-    int n;
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    n = a.kind(3).cmp(b.kind(3));
-    if(n != 0) return n;
-    return a.kind(2).cmp(b.kind(2));
-  }
-
+  //! cmp kinds before kickers
+  //! low ace in st/sf
   int cmp(texhand o){
+    int n;
     texhand a,b;
 
     a = rf(), b = o.rf();
     if(!a.empty() || !b.empty()) return a._cmp(b);
 
     a = sf(), b = o.sf();
-    if(!a.empty() || !b.empty()) return a._cmpst(b);
+    if(!a.empty() || !b.empty()) return a._cmp(b);
 
     a = kind(4), b = o.kind(4);
     if(!a.empty() || !b.empty()) return a._cmp(b);
 
     a = fh(), b = o.fh();
-    if(!a.empty() || !b.empty()) return a._cmpfh(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      n = a.kind(3).cmp(b.kind(3));
+      if(n != 0) return n;
+      return a.kind(2).cmp(b.kind(2));
+    }
 
     a = fl(), b = o.fl();
     if(!a.empty() || !b.empty()) return a._cmp(b);
 
     a = st(), b = o.st();
-    if(!a.empty() || !b.empty()) return a._cmpst(b);
+    if(!a.empty() || !b.empty()) return a._cmp(b);
 
     a = kind(3), b = o.kind(3);
     if(!a.empty() || !b.empty()) return a._cmp(b);
