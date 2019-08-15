@@ -101,8 +101,9 @@ struct hand {
   str string(){
     int i;
     str r = "";
-    for(i = 0; i < size(); ++i)
+    for(i = 0; i < size()-1; ++i)
       r += h[i].string(), r += " ";
+    r += h[size()-1].string();
     return r;
   }
 

@@ -7,11 +7,11 @@ int main(){
   tex g;
   init();
 
-  //g.sim(texhand({CA, SA}), texhand(), 9);
+  g.sim(texhand({CA, SA}), texhand(), 9);
 
-  texhand h({C2, S2, D3, S7, D2, CJ, C3});
-  texhand s(h.fh());
-  printf("%s\n", s.string().c_str());
+  // texhand h({SA, DA, HA, SQ, CJ, SK, CA});
+  // texhand s(h.kind(4));
+  // printf("%s\n", s.string().c_str());
 
   return 0;
 }

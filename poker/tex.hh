@@ -52,7 +52,7 @@ struct texhand : hand {
           if(h[j].r == RANK[i]) r.pb(h[j]);
       if(r.size() == 4) break;
     }
-    if(r.size() < 4) return r;
+    if(r.size() < 4) return texhand();
     sort();
     for(i = 0; i < size(); ++i){
       for(f = true, j = 0; j < r.size(); ++j)
@@ -115,73 +115,216 @@ struct texhand : hand {
   }
 
   texhand sf(){
+    int i,j,k;
     texhand r;
-
-    return r;
+    sort();
+    for(i = 0; i < SN; ++i){
+      for(k = j = 0; j < size(); ++j)
+        if(h[j].s == SUIT[i]) ++k;
+      if(k >= HN){
+        for(j = 0; j < size(); ++j)
+          if(h[j].s == SUIT[i]) r.pb(h[j]);
+        break;
+      }
+    }
+    return r.st();
   }
 
   texhand rf(){
     texhand r;
-
-    return r;
+    r = sf();
+    return (!r.has('A') || !r.has('K')) ? texhand() : r;
   }
 
-  int _cmp(texhand o){
-    if(empty() && !o.empty()) return -1;
-    if(empty() && o.empty()) return 0;
-    if(!empty() && o.empty()) return 1;
-    int i;
-    sort(), o.sort();
-    for(i = 0; i < HN; ++i){
-      if(RI[(*this)[i].r] < RI[o[i].r]) return -1;
-      if(RI[(*this)[i].r] > RI[o[i].r]) return 1;
-    }
-    return 0;
-  }
-
-  //! cmp kinds before kickers
-  //! low ace in st/sf
   int cmp(texhand o){
-    int n;
-    texhand a,b;
+    char c,d;
+    int i,j,k,l;
+    texhand a,b,p,q;
 
     a = rf(), b = o.rf();
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()) return 0;
 
     a = sf(), b = o.sf();
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      a.sort(), b.sort();
+      c = (a[0].r == 'A' && a[1].r == '5') ? a[1].r : a[0].r;
+      d = (b[0].r == 'A' && b[1].r == '5') ? a[1].r : a[0].r;
+      if(RI[c] < RI[d]) return -1;
+      if(RI[c] > RI[d]) return 1;
+      return 0;
+    }
 
     a = kind(4), b = o.kind(4);
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        if(k < 4 && l == 4) return -1;
+        if(k == 4 && l < 4) return 1;
+        if(k == 4 && l == 4){
+          for(j = 0; j < HN; ++j){
+            if(a[j].r != RANK[i]) c = a[j].r;
+            if(b[j].r != RANK[i]) d = a[j].r;
+          }
+          if(RI[c] < RI[d]) return -1;
+          if(RI[c] > RI[d]) return 1;
+          return 0;
+        }
+      }
+      //unr
+    }
 
     a = fh(), b = o.fh();
     if(a.empty() && !b.empty()) return -1;
     if(!a.empty() && b.empty()) return 1;
     if(!a.empty() && !b.empty()){
-      n = a.kind(3).cmp(b.kind(3));
-      if(n != 0) return n;
-      return a.kind(2).cmp(b.kind(2));
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        if(k < 3 && l == 3) return -1;
+        if(k == 3 && l < 3) return 1;
+      }
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        if(k < 2 && l == 2) return -1;
+        if(k == 2 && l < 2) return 1;
+        if(k == 2 && l == 2) return 0;
+      }
+      //unr
     }
 
     a = fl(), b = o.fl();
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      a.sort(), b.sort();
+      for(i = 0; i < HN; ++i){
+        if(RI[a[i].r] < RI[b[i].r]) return -1;
+        if(RI[a[i].r] > RI[b[i].r]) return 1;
+      }
+      return 0;
+    }
 
     a = st(), b = o.st();
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      a.sort(), b.sort();
+      c = (a[0].r == 'A' && a[1].r == '5') ? a[1].r : a[0].r;
+      d = (b[0].r == 'A' && b[1].r == '5') ? a[1].r : a[0].r;
+      if(RI[c] < RI[d]) return -1;
+      if(RI[c] > RI[d]) return 1;
+      return 0;
+    }
 
     a = kind(3), b = o.kind(3);
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        if(k < 3 && l == 3) return -1;
+        if(k == 3 && l < 3) return 1;
+        if(k == 3 && l == 3){
+          p.clear(), q.clear();
+          for(j = 0; j < HN; ++j){
+            if(a[j].r != RANK[i]) p.pb(a[j]);
+            if(b[j].r != RANK[i]) q.pb(b[j]);
+          }
+          p.sort(), q.sort();
+          for(j = 0; j < 2; ++j){
+            if(RI[p[j].r] < RI[q[j].r]) return -1;
+            if(RI[p[j].r] > RI[q[j].r]) return 1;
+          }
+          return 0;
+        }
+      }
+      //unr
+    }
 
     a = pair2(), b = o.pair2();
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      p.clear(), q.clear();
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        for(j = 0; j < HN; ++j){
+          if(k == 2 && p.size() < 4 && a[j].r == RANK[i]) p.pb(a[j]);
+          if(l == 2 && q.size() < 4 && b[j].r == RANK[i]) q.pb(b[j]);
+        }
+      }
+      p.sort(), q.sort();
+      for(j = 0; j < 4; ++j){
+        if(RI[p[j].r] < RI[q[j].r]) return -1;
+        if(RI[p[j].r] > RI[q[j].r]) return 1;
+      }
+      for(j = 0; j < HN; ++j){
+        if(!p.has(a[j].r)) c = a[j].r;
+        if(!q.has(b[j].r)) d = b[j].r;
+      }
+      if(RI[c] < RI[d]) return -1;
+      if(RI[c] > RI[d]) return 1;
+      return 0;
+    }
 
     a = kind(2), b = o.kind(2);
-    if(!a.empty() || !b.empty()) return a._cmp(b);
+    if(a.empty() && !b.empty()) return -1;
+    if(!a.empty() && b.empty()) return 1;
+    if(!a.empty() && !b.empty()){
+      for(i = RN-1; i >= 0; --i){
+        for(l = k = j = 0; j < HN; ++j){
+          if(a[j].r == RANK[i]) ++k;
+          if(b[j].r == RANK[i]) ++l;
+        }
+        if(k < 2 && l == 2) return -1;
+        if(k == 2 && l < 2) return 1;
+        if(k == 2 && l == 2){
+          p.clear(), q.clear();
+          for(j = 0; j < HN; ++j){
+            if(a[j].r != RANK[i]) p.pb(a[j]);
+            if(b[j].r != RANK[i]) q.pb(b[j]);
+          }
+          p.sort(), q.sort();
+          for(j = 0; j < 3; ++j){
+            if(RI[p[j].r] < RI[q[j].r]) return -1;
+            if(RI[p[j].r] > RI[q[j].r]) return 1;
+          }
+          return 0;
+        }
+      }
+      //unr
+    }
 
     a = hi(), b = o.hi();
-    return a._cmp(b);
+    a.sort(), b.sort();
+    for(j = 0; j < HN; ++j){
+      if(RI[a[j].r] < RI[b[j].r]) return -1;
+      if(RI[a[j].r] > RI[b[j].r]) return 1;
+    }
+    return 0;
   }
 };
+
 
 struct tex {
   // Given a 2-card hand, 0-5 card board, and number of players:
@@ -199,8 +342,6 @@ struct tex {
       d0.erase(h[i]);
     for(i = 0; i < b.size(); ++i)
       d0.erase(b[i]);
-
-    printf("%d\n", ph.size());
 
     iter = 1000000, w = t = 0;
     for(k = 0; k < iter; ++k){
@@ -221,11 +362,11 @@ struct tex {
         if(n < m) m = n;
         if(m == -1) break;
       }
+
       if(m == 1) ++w;
       if(m == 0) ++t;
+      printf("%.2lf%% win\n", (double)w / (k+1) * 100);
+      printf("%.2lf%% tie\n\n", (double)t / (k+1) * 100);
     }
-
-    printf("%.2lf%% win\n", (double)w / iter);
-    printf("%.2lf%% tie\n", (double)t / iter);
   }
 };
