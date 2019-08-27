@@ -2,395 +2,182 @@
 
 #include "bot.hh"
 
-#define HN 5
 
-
-struct texhand : hand {
-  texhand(){}
-  texhand(vec<card> _h): hand(_h) {}
-
-  virtual str string(){
-    str r(hand::string());
-    if(!rf().empty()) r += " (Royal Flush)";
-    else if(!sf().empty()) r += " (Straight Flush)";
-    else if(!kind(4).empty()) r += " (Four of a Kind)";
-    else if(!fh().empty()) r += " (Full House)";
-    else if(!fl().empty()) r += " (Flush)";
-    else if(!st().empty()) r += " (Straight)";
-    else if(!kind(3).empty()) r += " (Three of a Kind)";
-    else if(!pair2().empty()) r += " (Two Pair)";
-    else if(!kind(2).empty()) r += " (Pair)";
-    return r;
-  }
-
-  texhand hi(){
-    texhand r(*this);
-    r.sort();
-    while(r.size() > HN)
-      r.popb();
-    return r;
-  }
-
-  texhand kind(int n){
-    bool f;
-    int i,j,k;
-    texhand r;
-    for(i = RN-1; i >= 0; --i){
-      for(k = j = 0; j < size(); ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if(k == n){
-        for(j = 0; j < size(); ++j)
-          if(h[j].r == RANK[i]) r.pb(h[j]);
-        break;
-      }
-    }
-    if(r.empty()) return r;
-    sort();
-    for(k = i = 0; i < size() && r.size() < HN; ++i){
-      for(f = true, j = 0; j < r.size(); ++j)
-        if(h[i].r == r[j].r){ f = false; break; }
-      if(f) r.pb(h[i]);
-    }
-    return r;
-  }
-
-  texhand pair2(){
-    bool f;
-    int i,j,k;
-    texhand r;
-    for(i = RN-1; i >= 0; --i){
-      for(j = k = 0; j < size(); ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if(k == 2)
-        for(j = 0; j < size(); ++j)
-          if(h[j].r == RANK[i]) r.pb(h[j]);
-      if(r.size() == 4) break;
-    }
-    if(r.size() < 4) return texhand();
-    sort();
-    for(i = 0; i < size(); ++i){
-      for(f = true, j = 0; j < r.size(); ++j)
-        if(h[i].r == r[j].r){ f = false; break; }
-      if(f){ r.pb(h[i]); break; }
-    }
-    return r;
-  }
-
-  texhand st(){
-    bool f;
-    int i,j,k;
-    texhand r;
-    sort();
-    for(i = RN-1; i >= HN-2; --i){
-      f = true;
-      for(j = i; j != ((i-HN < 0) ? i-HN+RN : i-HN); j = (j ? j-1 : RN-1))
-        if(!has(RANK[j])){ f = false; break; }
-      if(f){
-        for(j = i; j != ((i-HN < 0) ? i-HN+RN : i-HN); j = (j ? j-1 : RN-1))
-          for(k = 0; k < size(); ++k)
-            if(h[k].r == RANK[j]){ r.pb(h[k]); break; }
-        return r;
-      }
-    }
-    return r;
-  }
-
-  texhand fl(){
-    int i,j,k;
-    texhand r;
-    sort();
-    for(i = 0; i < SN; ++i){
-      for(k = j = 0; j < size(); ++j)
-        if(h[j].s == SUIT[i]) ++k;
-      if(k >= HN){
-        for(j = 0; j < size() && r.size() < HN; ++j)
-          if(h[j].s == SUIT[i]) r.pb(h[j]);
-        break;
-      }
-    }
-    return r;
-  }
-
-  texhand fh(){
-    char a,b;
-    int i,j,k;
-    texhand r;
-    if(kind(2).empty() || kind(3).empty()) return r;
-    sort(), a = b = 0;
-    for(i = 0; i < RN; ++i){
-      for(k = j = 0; j < size(); ++j)
-        if(h[j].r == RANK[i]) ++k;
-      if((!a && k == 3) || (!b && k == 2))
-        for(j = 0; j < size(); ++j)
-          if(h[j].r == RANK[i]) r.pb(h[j]);
-      if(a && b) break;
-    }
-    return r;
-  }
-
-  texhand sf(){
-    int i,j,k;
-    texhand r;
-    sort();
-    for(i = 0; i < SN; ++i){
-      for(k = j = 0; j < size(); ++j)
-        if(h[j].s == SUIT[i]) ++k;
-      if(k >= HN){
-        for(j = 0; j < size(); ++j)
-          if(h[j].s == SUIT[i]) r.pb(h[j]);
-        break;
-      }
-    }
-    return r.st();
-  }
-
-  texhand rf(){
-    texhand r;
-    r = sf();
-    return (!r.has('A') || !r.has('K')) ? texhand() : r;
-  }
-
-  int cmp(texhand o){
-    char c,d;
-    int i,j,k,l;
-    texhand a,b,p,q;
-
-    a = rf(), b = o.rf();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()) return 0;
-
-    a = sf(), b = o.sf();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      a.sort(), b.sort();
-      c = (a[0].r == 'A' && a[1].r == '5') ? a[1].r : a[0].r;
-      d = (b[0].r == 'A' && b[1].r == '5') ? a[1].r : a[0].r;
-      if(RI[c] < RI[d]) return -1;
-      if(RI[c] > RI[d]) return 1;
-      return 0;
-    }
-
-    a = kind(4), b = o.kind(4);
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        if(k < 4 && l == 4) return -1;
-        if(k == 4 && l < 4) return 1;
-        if(k == 4 && l == 4){
-          for(j = 0; j < HN; ++j){
-            if(a[j].r != RANK[i]) c = a[j].r;
-            if(b[j].r != RANK[i]) d = a[j].r;
-          }
-          if(RI[c] < RI[d]) return -1;
-          if(RI[c] > RI[d]) return 1;
-          return 0;
-        }
-      }
-      //unr
-    }
-
-    a = fh(), b = o.fh();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        if(k < 3 && l == 3) return -1;
-        if(k == 3 && l < 3) return 1;
-      }
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        if(k < 2 && l == 2) return -1;
-        if(k == 2 && l < 2) return 1;
-        if(k == 2 && l == 2) return 0;
-      }
-      //unr
-    }
-
-    a = fl(), b = o.fl();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      a.sort(), b.sort();
-      for(i = 0; i < HN; ++i){
-        if(RI[a[i].r] < RI[b[i].r]) return -1;
-        if(RI[a[i].r] > RI[b[i].r]) return 1;
-      }
-      return 0;
-    }
-
-    a = st(), b = o.st();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      a.sort(), b.sort();
-      c = (a[0].r == 'A' && a[1].r == '5') ? a[1].r : a[0].r;
-      d = (b[0].r == 'A' && b[1].r == '5') ? a[1].r : a[0].r;
-      if(RI[c] < RI[d]) return -1;
-      if(RI[c] > RI[d]) return 1;
-      return 0;
-    }
-
-    a = kind(3), b = o.kind(3);
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        if(k < 3 && l == 3) return -1;
-        if(k == 3 && l < 3) return 1;
-        if(k == 3 && l == 3){
-          p.clear(), q.clear();
-          for(j = 0; j < HN; ++j){
-            if(a[j].r != RANK[i]) p.pb(a[j]);
-            if(b[j].r != RANK[i]) q.pb(b[j]);
-          }
-          p.sort(), q.sort();
-          for(j = 0; j < 2; ++j){
-            if(RI[p[j].r] < RI[q[j].r]) return -1;
-            if(RI[p[j].r] > RI[q[j].r]) return 1;
-          }
-          return 0;
-        }
-      }
-      //unr
-    }
-
-    a = pair2(), b = o.pair2();
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      p.clear(), q.clear();
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        for(j = 0; j < HN; ++j){
-          if(k == 2 && p.size() < 4 && a[j].r == RANK[i]) p.pb(a[j]);
-          if(l == 2 && q.size() < 4 && b[j].r == RANK[i]) q.pb(b[j]);
-        }
-      }
-      p.sort(), q.sort();
-      for(j = 0; j < 4; ++j){
-        if(RI[p[j].r] < RI[q[j].r]) return -1;
-        if(RI[p[j].r] > RI[q[j].r]) return 1;
-      }
-      for(j = 0; j < HN; ++j){
-        if(!p.has(a[j].r)) c = a[j].r;
-        if(!q.has(b[j].r)) d = b[j].r;
-      }
-      if(RI[c] < RI[d]) return -1;
-      if(RI[c] > RI[d]) return 1;
-      return 0;
-    }
-
-    a = kind(2), b = o.kind(2);
-    if(a.empty() && !b.empty()) return -1;
-    if(!a.empty() && b.empty()) return 1;
-    if(!a.empty() && !b.empty()){
-      for(i = RN-1; i >= 0; --i){
-        for(l = k = j = 0; j < HN; ++j){
-          if(a[j].r == RANK[i]) ++k;
-          if(b[j].r == RANK[i]) ++l;
-        }
-        if(k < 2 && l == 2) return -1;
-        if(k == 2 && l < 2) return 1;
-        if(k == 2 && l == 2){
-          p.clear(), q.clear();
-          for(j = 0; j < HN; ++j){
-            if(a[j].r != RANK[i]) p.pb(a[j]);
-            if(b[j].r != RANK[i]) q.pb(b[j]);
-          }
-          p.sort(), q.sort();
-          for(j = 0; j < 3; ++j){
-            if(RI[p[j].r] < RI[q[j].r]) return -1;
-            if(RI[p[j].r] > RI[q[j].r]) return 1;
-          }
-          return 0;
-        }
-      }
-      //unr
-    }
-
-    a = hi(), b = o.hi();
-    a.sort(), b.sort();
-    for(j = 0; j < HN; ++j){
-      if(RI[a[j].r] < RI[b[j].r]) return -1;
-      if(RI[a[j].r] > RI[b[j].r]) return 1;
-    }
-    return 0;
+struct betcmp {
+  vec<bot*> bots;
+  betcmp(vec<bot*>& _bots): bots(_bots) {}
+  bool operator()(int i, int j) const {
+    return bots[i]->bet > bots[j]->bet;
   }
 };
 
-
 struct tex {
-  void play(vec<bot*> bots){
-    int i,j,t;
-    texhand b;
-    deck d;
+  int ante, blind, p1, bet;
+  hand board;
+  deck d;
+  vec<bot*> bots;
+  vec<pot> pots;
 
+  tex(vec<bot*> _bots, int _ante, int _blind):
+    bots(_bots), ante(_ante), blind(_blind), p1(0) {}
+
+  // Returns true if hand is over
+  bool betone(int i){
+    bool f;
+    int j,c;
+    for(j = 0, f = true; j < bots.size(); ++j)
+      if(i != j && !bots[j]->out){ f = false; break; }
+    if(f) return true;
+    c = bots[i]->bet_tex(this);
+    if(c == -1){ bots[i]->out = true; return false; }
+    bots[i]->pay(c);
+    if(bots[i]->bet > bet) bet = bots[i]->bet;
+    return false;
+  }
+
+  //! Pots created incorrectly on bets that folded
+  // Returns true if hand is over
+  bool betround(){
+    bool f, done;
+    int i,j,n;
+    vec<int> v;
+    vec<pot> pots2;
+
+    // Place bets
+    done = false;
+    for(i = p1; i < bots.size(); ++i)
+      if(!bots[i]->out && betone(i))
+        done = true;
+    for(i = 0; i < p1; ++i)
+      if(!bots[i]->out && betone(i))
+        done = true;
     for(i = 0; i < bots.size(); ++i)
-      bots[i]->h = new texhand();
-    t = 0;
+      if(!bots[i]->out) v.pb(i);
+    std::sort(v.begin(), v.end(), betcmp(bots));
 
+    // Create new pots
+    while(!v.empty()){
+      pot p;
+      for(i = 0; i < v.size(); ++i)
+        p.players.pb(v[i]);
+      n = bots[v.back()]->bet;
+      for(i = 0; i < v.size(); ++i)
+        p.cash += n, bots[v[i]]->bet -= n;
+      while(!v.empty() && !bots[v.back()]->bet)
+        v.pop_back();
+      pots2.pb(p);
+    }
+
+    // Merge new pots into existing
+    for(i = 0; i < pots2.size(); ++i){
+      for(j = 0, f = false; j < pots.size(); ++j){
+        if(pots2[i] == pots[j]){
+          pots[j].cash += pots2[i].cash;
+          f = true;
+          break;
+        }
+      }
+      if(!f) pots.pb(pots2[i]);
+    }
+
+    // Clear bets
+    for(i = 0; i < bots.size(); ++i)
+      bots[i]->bet = 0;
+    return done;
+  }
+
+  void play(){
+    bool f;
+    int i,j,k,t;
+    vec<int> winners;
+
+    t = 0;
     while(bots.size() > 1){
       ++t;
-      printf("\nTURN %d:\n", t);
-      d = DECK, d.shuf(), b.clear();
+      printf("\nTURN %d:\n(%d", t, bots[0]->cash);
+      for(i = 1; i < bots.size(); ++i)
+        printf(", %d", bots[i]->cash);
+      printf(")\n");
+
+      // Rejoin players
+      for(i = 0; i < bots.size(); ++i)
+        bots[i]->out = false;
+
+      // Pay blinds
+      i = (p1-1 < 0) ? p1-1+bots.size() : p1-1;
+      j = (p1-2 < 0) ? p1-2+bots.size() : p1-2;
+      bots[i]->pay(blind);
+      bots[j]->pay(blind >> 1);
+      bet = blind;
+
+      // Deal hands
+      d = DECK, d.shuf(), board.clear();
       for(j = 0; j < bots.size(); ++j)
-        bots[j]->h->clear();
+        bots[j]->hand.clear();
       for(i = 0; i < 2; ++i)
         for(j = 0; j < bots.size(); ++j)
-          bots[j]->h->pb(d.draw());
+          bots[j]->hand.pb(d.draw());
 
-      //bet();
+      // Bet and show
+      f = betround();
+      if(!f){
+        d.draw();
+        for(i = 0; i < 3; ++i)
+          board.pb(d.draw());
+        printf("\nFLOP: %s\n", board.string().c_str());
+        f = betround();
+        if(!f){
+          d.draw();
+          board.pb(d.draw());
+          printf("\nTURN: %s\n", board.string().c_str());
+          f = betround();
+          if(!f){
+            d.draw();
+            board.pb(d.draw());
+            printf("\nRIVER: %s\n\n", board.string().c_str());
+            betround();
+          }
+        }
+      }
 
-      d.draw();
-      for(i = 0; i < 3; ++i)
-        b.pb(d.draw());
-      printf("FLOP: %s\n", b.string().c_str());
+      // Award pots
+      for(i = 0; i < pots.size(); ++i){
+        winners.clear();
+        for(j = 0; j < pots[i].players.size(); ++j){
+          for(k = 0, f = true; k < pots[i].players.size(); ++k)
+            if(j != k && bots[pots[i].players[j]]->hand.cmp(
+                         bots[pots[i].players[k]]->hand) == -1){
+              f = false; break; }
+          if(f) winners.pb(pots[i].players[j]);
+        }
+        for(j = 0; j < winners.size(); ++j){
+          k = pots[i].cash / winners.size();
+          bots[winners[j]]->cash += k;
+          printf("Bot %d won %d\n", winners[j], k);
+        }
+      }
+      pots.clear();
 
-      //bet();
+      // Remove players
+      for(i = 0; i < bots.size(); ++i){
+        if(!bots[i]->cash){
+          bots.erase(bots.begin() + i);
+          if(p1 >= i) p1 = (p1-1 < 0) ? bots.size()-1 : p1-1;
+          i = 0;
+        }
+      }
 
-      d.draw();
-      b.pb(d.draw());
-      printf("TURN: %s\n", b.string().c_str());
-
-      //bet();
-
-      d.draw();
-      b.pb(d.draw());
-      printf("RIVER: %s\n", b.string().c_str());
-
-      //bet();
-
-
+      // Rotate dealer
+      p1 = (p1 == bots.size()-1) ? 0 : p1+1;
+      getchar();
     }
   }
 
   // Given a 2-card hand, 0-5 card board, and number of players:
   // % chance of winning
   // % chance of getting certain hand
-  // Bet recommendations
   void sim(texhand h, texhand b, int p){
-    int i,j,k,m,n,w,t, iter;
+    int i,j,k,m,n,w,t, p1,p2,k3,st,fl,fh,k4,sf,rf;
     texhand hn,bn;
     deck d,d0;
     vec<texhand> ph;
@@ -398,18 +185,31 @@ struct tex {
     d0 = DECK;
     for(i = 0; i < h.size(); ++i)
       d0.erase(h[i]);
-    for(i = 0; i < b.size(); ++i)
+    for(i = 0; i < board.size(); ++i)
       d0.erase(b[i]);
 
-    iter = 1000000, w = t = 0;
-    for(k = 0; k < iter; ++k){
+    w = t = p1 = p2 = k3 = st = fl = fh = k4 = sf = rf = 0;
+    for(k = 0; k < 10000000; ++k){
       d = d0, d.shuf();
       ph.clear(), ph.pb(h);
       for(i = 0; i < p-1; ++i)
         hn.clear(), hn.pb(d.draw()), hn.pb(d.draw()), ph.pb(hn);
       bn = b;
-      for(i = 0; i < HN-b.size(); ++i)
+      for(i = 0; i < HN-board.size(); ++i)
         bn.pb(d.draw());
+
+      hn = ph[0];
+      for(i = 0; i < bn.size(); ++i)
+        hn.pb(bn[i]);
+      if(!hn.rf().empty()) ++rf;
+      else if(!hn.sf().empty()) ++sf;
+      else if(!hn.kind(4).empty()) ++k4;
+      else if(!hn.fh().empty()) ++fh;
+      else if(!hn.fl().empty()) ++fl;
+      else if(!hn.st().empty()) ++st;
+      else if(!hn.kind(3).empty()) ++k3;
+      else if(!hn.pair2().empty()) ++p2;
+      else if(!hn.kind(2).empty()) ++p1;
 
       for(i = 0; i < p; ++i)
         for(j = 0; j < HN; ++j)
@@ -420,11 +220,49 @@ struct tex {
         if(n < m) m = n;
         if(m == -1) break;
       }
-
       if(m == 1) ++w;
       if(m == 0) ++t;
-      printf("%.2lf%% win\n", (double)w / (k+1) * 100);
-      printf("%.2lf%% tie\n\n", (double)t / (k+1) * 100);
+
+      printf("\n----------------\n\n");
+      printf("%.2lf%% win\n",          (double)w / (k+1) * 100);
+      printf("%.2lf%% tie\n\n",            (double)t / (k+1) * 100);
+      printf("%.2lf%% royal flush\n",    (double)rf / (k+1) * 100);
+      printf("%.2lf%% straight flush\n", (double)sf / (k+1) * 100);
+      printf("%.2lf%% 4 of a kind\n",    (double)k4 / (k+1) * 100);
+      printf("%.2lf%% full house\n",     (double)fh / (k+1) * 100);
+      printf("%.2lf%% flush\n",          (double)fl / (k+1) * 100);
+      printf("%.2lf%% straight\n",       (double)st / (k+1) * 100);
+      printf("%.2lf%% 3 of a kind\n",    (double)k3 / (k+1) * 100);
+      printf("%.2lf%% 2 pair\n",         (double)p2 / (k+1) * 100);
+      printf("%.2lf%% pair\n",           (double)p1 / (k+1) * 100);
     }
   }
 };
+
+
+int human::bet_tex(tex* g){
+  int n,o;
+  o = 0;
+  while(o < 1 || o > 3){
+    printf("\nYou have %s and %d cash\n"
+           "Bet is at %d\n"
+           "(1) Raise\n"
+           "(2) Call %d\n"
+           "(3) Fold\n"
+           "> ",
+           hand.string().c_str(), cash, g->bet, g->bet - bet);
+    scanf("%d", &o);
+  }
+  if(o == 1){
+    printf("Raise to ");
+    scanf("%d", &n);
+    return n - bet;
+  }else if(o == 2) return g->bet - bet;
+  else return -1;
+}
+
+
+int ai::bet_tex(tex* g){
+  //!
+  return -1;
+}

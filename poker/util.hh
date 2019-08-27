@@ -119,9 +119,24 @@ struct hand {
     bool operator()(card a, card b) const {
       return RI[a.r] > RI[b.r];
     }
-  } sortcmp;
+  } cardcmp;
   void sort(){
-    std::sort(h.begin(), h.end(), sortcmp);
+    std::sort(h.begin(), h.end(), cardcmp);
+  }
+};
+
+
+struct pot {
+  int cash;
+  vec<int> players;
+  bool operator==(pot& o){
+    int i;
+    if(players.size() != o.players.size()) return false;
+    std::sort(players.begin(), players.end());
+    std::sort(o.players.begin(), o.players.end());
+    for(i = 0; i < players.size(); ++i)
+      if(players[i] != o.players[i]) return false;
+    return true;
   }
 };
 
