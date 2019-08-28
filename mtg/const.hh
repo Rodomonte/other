@@ -3,7 +3,21 @@
 #ifndef const_hh
 #define const_hh
 
-#include "def.hh"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+
+
+#define ll   long long
+#define str  std::string
+#define vec  std::vector
+#define uset std::unordered_set
+#define umap std::unordered_map
+#define pb   push_back
 
 
 const str

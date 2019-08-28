@@ -67,26 +67,25 @@ str next(){
 }
 
 // JSON -> Card objects
-stat parse(){
+void parse(){
   FILE* fp;
   int n;
   str s;
   Card c;
 
   fp = fopen(lpath, "r");
-  if(fp == NULL) printf(":(\n");
   fseek(fp, 0, SEEK_END);
   n = ftell(fp);
   fseek(fp, 0, SEEK_SET);
   fread(buf, sizeof(char), n, fp);
   fclose(fp);
 
+  printf("Generating card objects..\n");
   sss = buf, iii = 0;
   while(sss.find("{", iii) != str::npos){
     c = fill(json2umap(next()));
     card_lib[c.name] = c;
   }
-  return PASS;
 }
 
 

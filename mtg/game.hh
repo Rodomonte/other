@@ -87,7 +87,7 @@ struct Game {
     return PASS;
   }
 
-  stat init(){
+  void init(){
     int i;
     turn = 0;
     for(i = 0; i < deck.size(); ++i)
@@ -99,8 +99,8 @@ struct Game {
     return PASS;
   }
 
-  stat run(){
-    check(init());
+  void play(){
+    init();
     while(1){
       //check(log(string()));
       if(done()) break;
