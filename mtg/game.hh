@@ -3,27 +3,34 @@
 #ifndef game_hh
 #define game_hh
 
-#include "bot.hh"
-#include "deck.hh"
+#include "obj.hh"
 
 
-struct MultiCard {
-  int n, tapped, attacking;
-  Card c;
-  MultiCard(Card& _c): c(_c), n(1) {}
+struct Game;
+
+struct Bot {
+  int life;
+  Deck deck;
+  vec<Sleeve> library, hand, field, grave, exile;
+
+  Bot(Deck& d): deck(d) {}
+
+  virtual void main1(Game& g) = 0;
+  virtual void attack(Game& g) = 0;
+  virtual void block(Game& g) = 0;
+  virtual void main2(Game& g) = 0;
+  virtual void respond(Game& g, Card& c) = 0;
 };
 
-struct Game {
-  int       cp, turn;
-  Format    format;
-  vec<int>  life;
-  vec<Bot*> bot;
-  vec<Deck> deck;
-  vec<umap<str, MultiCard> > hand, field, grave, exile;
 
-  Game(){}
-  Game(Format _format, vec<Bot*>& _bot, vec<Deck>& _deck):
-      format(_format), bot(_bot), deck(_deck) { init(); }
+struct Game {
+  int player, turn;
+  Format format;
+  vec<Bot*> bot;
+
+  Game(vec<Bot*>& b): bot(b) {
+
+  }
 
   bool cost_sat(Card& c, int t){
     umap<str, int>::iterator it;
@@ -74,46 +81,93 @@ struct Game {
     return n >= life.size()-1;
   }
 
-  stat draw(int p, int n){
+  void draw(int p, int n){
     int i;
     umap<str, MultiCard>::iterator it;
-    if(deck[p].main.size() < n) return KILL; //!
+    if(bot[p].deck.main.size() < n){
+      kill(p
+      return;
+    }
     for(i = 0; i < n; ++i){
       if((it = hand[p].find(deck[p].main.back().name)) == hand[p].end())
         hand[p][deck[p].main.back().name] = MultiCard(deck[p].main.back());
       else ++it->second.n;
       deck[p].main.pop_back();
     }
-    return PASS;
   }
 
   void init(){
     int i;
     turn = 0;
-    for(i = 0; i < deck.size(); ++i)
+    for(i = 0; i < bot.size(); ++i)
       life.pb((format == EDH) ? 40 : 20);
     //check(init_log());
-    cp = rand() % life.size();
-    for(i = 0; i < life.size(); ++i)
-      check(draw(deck[i], hand[i], 7));
-    return PASS;
+    player = rand() % bot.size();
+    for(i = 0; i < bot.size(); ++i)
+      draw(i, 7);
   }
 
   void play(){
     init();
-    while(1){
-      //check(log(string()));
-      if(done()) break;
+    while(!done()){
       //! upkeep
-      if(turn > 1)
-        draw(cp);
-      bot[cp].main1(*this);
-      bot[cp].attack(*this);
+      if(turn > 1) draw(player, 1);
+      bot[player]->main1(*this);
+      bot[player]->attack(*this);
       //! blocks
-      bot[cp].main2(*this);
+      bot[player]->main2(*this);
       //! end
     }
-    return PASS;
+  }
+};
+
+
+struct Human : Bot {
+  Human(Deck& d): Bot(d) {}
+
+  void main1(Game& g){
+    //!
+  }
+
+  void attack(Game& g){
+    //!
+  }
+
+  void block(Game& g){
+    //!
+  }
+
+  void main2(Game& g){
+    //!
+  }
+
+  void respond(Game& g, Card& c){
+    //!
+  }
+};
+
+
+struct AI : Bot {
+  AI(Deck& d): Bot(d) {}
+
+  void main1(Game& g){
+    //!
+  }
+
+  void attack(Game& g){
+    //!
+  }
+
+  void block(Game& g){
+    //!
+  }
+
+  void main2(Game& g){
+    //!
+  }
+
+  void respond(Game& g, Card& c){
+    //!
   }
 };
 

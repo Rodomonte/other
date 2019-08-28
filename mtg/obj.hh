@@ -3,14 +3,14 @@
 #ifndef obj_hh
 #define obj_hh
 
+#include "util.hh"
 
-struct Game;
 
 struct Card {
   int            bpow, btuf;
   str            name;
   uset<str>      types, quals;
-  umap<str, int> cost, counters;
+  umap<str, int> cost;
 
   Card(){}
   Card(str& _name, int _bpow, int _btuf, uset<str>& _types, uset<str>& _quals,
@@ -83,40 +83,40 @@ struct Card {
            in(TYPES[ENC], types) || in(TYPES[LAN], types);
   }
   bool nlperm(){ return perm() && !in(TYPES[LAN], types); }
+};
 
-  stat load(int id){
-    return PASS;
-  }
 
-  stat write(){
-    return PASS;
-  }
+struct Sleeve {
+  bool tapped, attacking;
+  Card card;
+  umap<str, int> counter;
+
+  Sleeve(Card& c): card(c), tapped(false), attacking(false) {}
+};
+
+
+Trigger
+
+
+struct Quality {
+  Trigger trigger;
+  Action action;
+  Sleeve* owner;
 };
 
 
 struct Deck {
-  int       id;
-  Format    format;
-  str       name;
+  Format format;
+  str name;
   vec<Card> main, side, extra;
 
-  Deck(){}
-  Deck(int _id, Format _format): id(_id), format(_format) {}
-  Deck(vec<Card> _main, vec<Card> _side, vec<Card> _extra):
-    main(_main), side(_side), extra(_extra) {}
+  Deck(Format f): format(f) {}
 
   void shuffle(){
     int i,j;
     Card c;
     for(i = main.size()-1; i > 0; --i)
       j = rand()%(i+1), c = main[i], main[i] = main[j], main[j] = c;
-  }
-
-  //str file(){ return str(sprintf(_, "%s/d%4d.deck", DECK_DIRS[format], id)); }
-
-  void from_file(){
-    str s;
-
   }
 
   str string(){
@@ -137,17 +137,7 @@ struct Deck {
            str("\n");
     return s;
   }
-
-  // void to_file(){
-  //   FILE* fp;
-  //   fp = fopen(file().c_str(), "w");
-  //   //fprintf(
-  // }
 };
-
-
-vec<Deck> deck_lib;
-umap<str, Card> card_lib;
 
 
 #endif

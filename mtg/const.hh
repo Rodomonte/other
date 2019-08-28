@@ -3,14 +3,12 @@
 #ifndef const_hh
 #define const_hh
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
-
 
 #define ll   long long
 #define str  std::string
@@ -20,59 +18,87 @@
 #define pb   push_back
 
 
-const str
-  BOTS_DIR  = "obj/bots"
-, LIB_DIR   = "obj/lib"
-, DECKS_DIR = "obj/decks"
-
-, LIB_JSON  = LIB_DIR + "/lib.json"
-
-, MAIN_OPTS =
-    "(0) Exit\n"
-    "(1) Update Library\n"
-    "(2) View Library\n"
-    "(3) View Decks\n"
-    "(4) Create Card\n"
-    "(5) Create Deck\n"
-    "(6) Play Game\n"
-    "(7) Sim Games\n"
-    "  > "
-
-, SIM_OPTS =
-    "(0) Exit\n"
-    "(1) Back\n"
-    "(2) EDH\n"
-    "(3) Modern\n"
-    "  > "
-
-, COLORS = "WUBRG";
-;
-
-
 enum Format
-{ EDH, DRA, MOD, SEA, STA, THG };
-enum Type
-{ ART, BAS, CRE, ENC, INS, LAN, LEG, PLA, SOR };
+{ EDH, MOD, STA, LIM, THG };
+int LIFE[5] =
+{  40,  20,  20,  20,  30 }
+  , DECK_MIN[5] =
+{ 100,  60,  40,  40,  60 };
 
-vec<int>
-  DECK_SIZES
-{ 100, 40, 60, 40, 60, 40 };
 
-vec<str>
-  FORMATS
-{ "Commander", "Draft", "Modern", "Sealed", "Standard", "Two-Headed Giant" }
-, TYPES
-{ "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land"
-, "Legendary", "Planeswalker", "Sorcery" }
-, DECK_DIRS
-{ DECKS_DIR+"/lim", DECKS_DIR+"/edh", DECKS_DIR+"/mod", DECKS_DIR+"/lim"
-, DECKS_DIR+"/sta", DECKS_DIR+"/thg" };
+// Whenever <Subject> <Action> <Object/Location>
+enum Subject
+{ NONE
 
-uset<str>
-  QUALS
-{ "Trample", "Flying", "Deathtouch", "Reach", "Vigilance", "Indestructible"
-, "Menace", "Lifelink", "Defender", "Delve", "Investigate", "First strike"
-, "Double strike", "Ingest", "Haste", "Flash", "Hexproof", "Prowess"};
+, SELF         // n
+, OTHER_PLAYER // n
+, ANY_PLAYER
+
+, THIS_CREATURE  // sleeve
+, OTHER_CREATURE // sleeve
+, ANY_CREATURE
+
+, OWN_CREATURE_OF_TYPE // s
+, ANY_CREATURE_OF_TYPE // s
+
+, ANY_PLANESWALKER
+
+
+, PLAYER_OR_PLANESWALKER
+, CREATURE_OR_PLANESWALKER
+, THIS_CREATURE      // sleeve
+, OTHER_CREATURE     // sleeve
+, OWN_CREATURE       // n
+, OTHER_OWN_CREATURE // n, sleeve
+, ENEMY_CREATURE     // n
+};
+
+enum Object
+{ NONE
+
+, ONE_PLAYER  // n
+, ALL_PLAYERS
+
+, ONE_CREATURE  // sleeve
+, ALL_CREATURES
+
+};
+
+enum Location
+{ LIBRARY
+, HAND
+, FIELD
+, GRAVE
+, EXILE
+};
+
+enum Action
+{ NONE
+, ATTACK
+, BLOCK
+, CAST
+, DRAW
+, MOVE
+};
+
+struct Event {
+  int n;
+  str s;
+  Identity subject, target;
+  Action action;
+  Location location;
+  Sleeve* sleeve;
+};
+
+// vec<str> TYPES
+// { "Artifact", "Basic", "Creature", "Enchantment", "Instant", "Land"
+// , "Legendary", "Planeswalker", "Sorcery" }
+
+// uset<str>
+//   QUALS
+// { "Trample", "Flying", "Deathtouch", "Reach", "Vigilance", "Indestructible"
+// , "Menace", "Lifelink", "Defender", "Delve", "Investigate", "First strike"
+// , "Double strike", "Ingest", "Haste", "Flash", "Hexproof", "Prowess"};
 
 
 #endif

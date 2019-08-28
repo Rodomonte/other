@@ -3,7 +3,7 @@
 #ifndef parse_hh
 #define parse_hh
 
-#include "../game/card.hh"
+#include "obj.hh"
 
 
 const char* lpath = "../obj/lib/lib.json";

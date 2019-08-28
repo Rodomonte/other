@@ -9,6 +9,9 @@
 char buf[64000000]
    , err[2048];
 
+#define assert(b) \
+  if(!b){ printf("bad assert in %s::%s\n", __FILE__, __FUNCTION__); exit(0); }
+
 void call(const char* cmd){
   int r = system(cmd);
   if(WIFEXITED(r) && !WEXITSTATUS(r)) return;
@@ -27,12 +30,12 @@ str replace(str s, str t, str n){
   return s;
 }
 
-template <typename T>
-vec<T> operator+(const vec<T>& a, const vec<T>& b){
-  vec<T> v(a);
-  v.insert(v.end(), b.begin(), b.end());
-  return v;
-}
+// template <typename T>
+// vec<T> operator+(const vec<T>& a, const vec<T>& b){
+//   vec<T> v(a);
+//   v.insert(v.end(), b.begin(), b.end());
+//   return v;
+// }
 
 bool isnum(str s){
   int i,d;
