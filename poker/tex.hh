@@ -21,48 +21,54 @@ struct tex {
   tex(vec<bot*> _bots, int _ante, int _blind):
     bots(_bots), ante(_ante), blind(_blind), p1(0) {}
 
-  // Returns true if hand is over
-  bool betone(int i){
-    bool f;
-    int j,c;
-    for(j = 0, f = true; j < bots.size(); ++j)
-      if(i != j && !bots[j]->out){ f = false; break; }
-    if(f) return true;
+  // Returns 1 if hand is over, 2 if raise, 0 otherwise
+  int betone(int i){
+    int j,c,n;
+    for(n = j = 0; j < bots.size(); ++j)
+      if(!bots[j]->out) ++n;
+    if(n < 2) return 1;
     c = bots[i]->bet_tex(this);
-    if(c == -1){ bots[i]->out = true; return false; }
+    if(c == -1){
+      bots[i]->out = true;
+      return (n < 3) ? 1 : 0;
+    }
     bots[i]->pay(c);
-    if(bots[i]->bet > bet) bet = bots[i]->bet;
-    return false;
+    if(bots[i]->bet > bet){
+      bet = bots[i]->bet;
+      return 2;
+    }
+    return 0;
   }
 
-  //! Pots created incorrectly on bets that folded
   // Returns true if hand is over
   bool betround(){
     bool f, done;
-    int i,j,n;
+    int i,j,n,t;
     vec<int> v;
     vec<pot> pots2;
 
     // Place bets
-    done = false;
-    for(i = p1; i < bots.size(); ++i)
-      if(!bots[i]->out && betone(i))
-        done = true;
-    for(i = 0; i < p1; ++i)
-      if(!bots[i]->out && betone(i))
-        done = true;
+    i = p1, n = 0, done = false;
+    while(n < bots.size() - 1){
+      if(bots[i]->out){ ++n; continue; }
+      t = betone(i);
+      if(t == 1){ done = true; break; }
+      else if(t == 2) n = 0;
+      else ++n;
+    }
+
+    // Create new pots
     for(i = 0; i < bots.size(); ++i)
       if(!bots[i]->out) v.pb(i);
     std::sort(v.begin(), v.end(), betcmp(bots));
-
-    // Create new pots
     while(!v.empty()){
       pot p;
       for(i = 0; i < v.size(); ++i)
         p.players.pb(v[i]);
-      n = bots[v.back()]->bet;
-      for(i = 0; i < v.size(); ++i)
-        p.cash += n, bots[v[i]]->bet -= n;
+      for(i = 0; i < bots.size(); ++i){
+        n = min(bots[v.back()]->bet, bots[i]->bet);
+        p.cash += n, bots[i]->bet -= n;
+      }
       while(!v.empty() && !bots[v.back()]->bet)
         v.pop_back();
       pots2.pb(p);
@@ -81,8 +87,8 @@ struct tex {
     }
 
     // Clear bets
-    for(i = 0; i < bots.size(); ++i)
-      bots[i]->bet = 0;
+    // for(i = 0; i < bots.size(); ++i)
+    //   bots[i]->bet = 0;
     return done;
   }
 

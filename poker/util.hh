@@ -24,6 +24,8 @@ const int CN = RN * SN;
 int RI[85], SI[86];
 
 
+int min(int a, int b){ return (a < b) ? a : b; }
+
 bool isrank(char c){
   int i;
   for(i = 0; i < RN; ++i)
