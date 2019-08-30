@@ -25,6 +25,7 @@ int RI[85], SI[86];
 
 
 int min(int a, int b){ return (a < b) ? a : b; }
+int max(int a, int b){ return (a > b) ? a : b; }
 
 bool isrank(char c){
   int i;

@@ -13,28 +13,44 @@ struct betcmp {
 
 struct tex {
   int blind, p1, bet;
-  hand board;
+  bot* raiser;
+  texhand board;
   deck d;
   vec<bot*> bots;
   vec<pot> pots;
 
   tex(vec<bot*> _bots, int _blind): bots(_bots), blind(_blind), p1(0) {}
 
+  int active(){
+    int i,n;
+    for(n = i = 0; i < bots.size(); ++i)
+      if(!bots[i]->out) ++n;
+    return n;
+  }
+
   // Returns 1 if hand is over, 2 if raise, 0 otherwise
   int betone(int i){
-    int j,c,n;
-    for(n = j = 0; j < bots.size(); ++j)
-      if(!bots[j]->out) ++n;
+    int j,k,c,n;
+    n = active();
     if(n < 2) return 1;
     c = bots[i]->bet_tex(this);
     printf("Bot %d bets %d\n", i, c);
+
     if(c == -1){
       bots[i]->out = true;
+      for(j = 0; j < pots.size(); ++j)
+        for(k = 0; k < pots[j].players.size(); ++k)
+          if(pots[j].players[k] == i){
+            pots[j].players.erase(pots[j].players.begin() + k);
+            break;
+          }
       return (n < 3) ? 1 : 0;
     }
+
     bots[i]->pay(c);
     if(bots[i]->bet > bet){
       bet = bots[i]->bet;
+      raiser = bots[i];
       return 2;
     }
     return 0;
@@ -50,11 +66,13 @@ struct tex {
     // Place bets
     i = p1, n = 0, done = false;
     while(n < bots.size()){
-      if(bots[i]->out){ ++n; continue; }
-      t = betone(i);
-      if(t == 1){ done = true; break; }
-      else if(t == 2) n = 0;
-      else ++n;
+      if(bots[i]->out) ++n;
+      else{
+        t = betone(i);
+        if(t == 1){ done = true; break; }
+        else if(t == 2) n = 0;
+        else ++n;
+      }
       i = (i == bots.size()-1) ? 0 : i+1;
     }
 
@@ -114,6 +132,7 @@ struct tex {
       // Rejoin players
       for(i = 0; i < bots.size(); ++i)
         bots[i]->out = false;
+      raiser = NULL;
 
       // Pay blinds
       i = (p1-1 < 0) ? p1-1+bots.size() : p1-1;
@@ -137,17 +156,17 @@ struct tex {
         for(i = 0; i < 3; ++i)
           board.pb(d.draw());
         printf("\nFLOP: %s\n", board.string().c_str());
-        f = betround();
+        bet = 0, f = betround();
         if(!f){
           d.draw();
           board.pb(d.draw());
           printf("\nTURN: %s\n", board.string().c_str());
-          f = betround();
+          bet = 0, f = betround();
           if(!f){
             d.draw();
             board.pb(d.draw());
             printf("\nRIVER: %s\n\n", board.string().c_str());
-            betround();
+            bet = 0, betround();
           }
         }
       }
@@ -184,14 +203,15 @@ struct tex {
     }
   }
 
-  // Given a 2-card hand, 0-5 card board, and number of players:
-  // % chance of winning
-  // % chance of getting certain hand
-  void sim(texhand h, texhand b, int p){
+  // Given a 2-card hand, 0-5 card board, and number of players,
+  // return chance of winning
+  float sim(texhand h, texhand b, int p){
     int i,j,k,m,n,w,t, p1,p2,k3,st,fl,fh,k4,sf,rf;
     texhand hn,bn;
     deck d,d0;
     vec<texhand> ph;
+
+    const int ITER = 10000;
 
     d0 = DECK;
     for(i = 0; i < h.size(); ++i)
@@ -200,7 +220,7 @@ struct tex {
       d0.erase(b[i]);
 
     w = t = p1 = p2 = k3 = st = fl = fh = k4 = sf = rf = 0;
-    for(k = 0; k < 10000000; ++k){
+    for(k = 0; k < ITER; ++k){
       d = d0, d.shuf();
       ph.clear(), ph.pb(h);
       for(i = 0; i < p-1; ++i)
@@ -234,19 +254,21 @@ struct tex {
       if(m == 1) ++w;
       if(m == 0) ++t;
 
-      printf("\n----------------\n\n");
-      printf("%.2lf%% win\n",          (double)w / (k+1) * 100);
-      printf("%.2lf%% tie\n\n",            (double)t / (k+1) * 100);
-      printf("%.2lf%% royal flush\n",    (double)rf / (k+1) * 100);
-      printf("%.2lf%% straight flush\n", (double)sf / (k+1) * 100);
-      printf("%.2lf%% 4 of a kind\n",    (double)k4 / (k+1) * 100);
-      printf("%.2lf%% full house\n",     (double)fh / (k+1) * 100);
-      printf("%.2lf%% flush\n",          (double)fl / (k+1) * 100);
-      printf("%.2lf%% straight\n",       (double)st / (k+1) * 100);
-      printf("%.2lf%% 3 of a kind\n",    (double)k3 / (k+1) * 100);
-      printf("%.2lf%% 2 pair\n",         (double)p2 / (k+1) * 100);
-      printf("%.2lf%% pair\n",           (double)p1 / (k+1) * 100);
+      // printf("\n----------------\n\n");
+      // printf("%.2lf%% win\n",          (double)w / (k+1) * 100);
+      // printf("%.2lf%% tie\n\n",            (double)t / (k+1) * 100);
+      // printf("%.2lf%% royal flush\n",    (double)rf / (k+1) * 100);
+      // printf("%.2lf%% straight flush\n", (double)sf / (k+1) * 100);
+      // printf("%.2lf%% 4 of a kind\n",    (double)k4 / (k+1) * 100);
+      // printf("%.2lf%% full house\n",     (double)fh / (k+1) * 100);
+      // printf("%.2lf%% flush\n",          (double)fl / (k+1) * 100);
+      // printf("%.2lf%% straight\n",       (double)st / (k+1) * 100);
+      // printf("%.2lf%% 3 of a kind\n",    (double)k3 / (k+1) * 100);
+      // printf("%.2lf%% 2 pair\n",         (double)p2 / (k+1) * 100);
+      // printf("%.2lf%% pair\n",           (double)p1 / (k+1) * 100);
+
     }
+    return (float)w / ITER;
   }
 };
 
@@ -274,6 +296,15 @@ int human::bet_tex(tex* g){
 
 
 int ai::bet_tex(tex* g){
-  //!
-  return -1;
+  int mx;
+  float w = g->sim(hand, g->board, g->active());
+  if(w > 0.8f) mx = cash;
+  else if(w > 0.6f) mx = cash / 4;
+  else if(w > 0.4f) mx = cash / 10;
+  else if(w > 0.2f) mx = cash / 50;
+  else mx = 0;
+
+  if(g->bet - bet > mx) return -1;
+  if(g->raiser == this) return 0;
+  return max(g->bet - bet, mx / (6 - g->board.size()));
 }
