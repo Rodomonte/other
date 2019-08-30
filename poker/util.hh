@@ -131,6 +131,7 @@ struct hand {
 struct pot {
   int cash;
   vec<int> players;
+  pot(): cash(0) {}
   bool operator==(pot& o){
     int i;
     if(players.size() != o.players.size()) return false;

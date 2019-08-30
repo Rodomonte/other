@@ -12,14 +12,13 @@ struct betcmp {
 };
 
 struct tex {
-  int ante, blind, p1, bet;
+  int blind, p1, bet;
   hand board;
   deck d;
   vec<bot*> bots;
   vec<pot> pots;
 
-  tex(vec<bot*> _bots, int _ante, int _blind):
-    bots(_bots), ante(_ante), blind(_blind), p1(0) {}
+  tex(vec<bot*> _bots, int _blind): bots(_bots), blind(_blind), p1(0) {}
 
   // Returns 1 if hand is over, 2 if raise, 0 otherwise
   int betone(int i){
@@ -28,6 +27,7 @@ struct tex {
       if(!bots[j]->out) ++n;
     if(n < 2) return 1;
     c = bots[i]->bet_tex(this);
+    printf("Bot %d bets %d\n", i, c);
     if(c == -1){
       bots[i]->out = true;
       return (n < 3) ? 1 : 0;
@@ -43,19 +43,26 @@ struct tex {
   // Returns true if hand is over
   bool betround(){
     bool f, done;
-    int i,j,n,t;
+    int i,j,m,n,t;
     vec<int> v;
     vec<pot> pots2;
 
     // Place bets
     i = p1, n = 0, done = false;
-    while(n < bots.size() - 1){
+    while(n < bots.size()){
       if(bots[i]->out){ ++n; continue; }
       t = betone(i);
       if(t == 1){ done = true; break; }
       else if(t == 2) n = 0;
       else ++n;
+      i = (i == bots.size()-1) ? 0 : i+1;
     }
+
+    //!
+    printf("Bets: (%d", bots[0]->bet);
+    for(i = 1; i < bots.size(); ++i)
+      printf(", %d", bots[i]->bet);
+    printf(")\n");
 
     // Create new pots
     for(i = 0; i < bots.size(); ++i)
@@ -65,12 +72,15 @@ struct tex {
       pot p;
       for(i = 0; i < v.size(); ++i)
         p.players.pb(v[i]);
+      m = bots[v.back()]->bet;
       for(i = 0; i < bots.size(); ++i){
-        n = min(bots[v.back()]->bet, bots[i]->bet);
+        n = min(m, bots[i]->bet);
         p.cash += n, bots[i]->bet -= n;
       }
       while(!v.empty() && !bots[v.back()]->bet)
         v.pop_back();
+      printf("Pot created with %d cash, %d players\n",
+             p.cash, p.players.size());
       pots2.pb(p);
     }
 
@@ -85,10 +95,6 @@ struct tex {
       }
       if(!f) pots.pb(pots2[i]);
     }
-
-    // Clear bets
-    // for(i = 0; i < bots.size(); ++i)
-    //   bots[i]->bet = 0;
     return done;
   }
 
@@ -175,7 +181,6 @@ struct tex {
 
       // Rotate dealer
       p1 = (p1 == bots.size()-1) ? 0 : p1+1;
-      getchar();
     }
   }
 
