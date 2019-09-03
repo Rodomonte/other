@@ -6,9 +6,7 @@
 #include "obj.hh"
 
 
-const char* lpath = "../obj/lib/lib.json";
-
-void parse_quals(Card& c, str s){
+void split_quals(Card& c, str s){
   int i,j;
   for(i = 0, j = -1; i < s.size(); ++i)
     if(s[i] == '\n' || s[i] == '('){
@@ -46,7 +44,7 @@ Card fill(umap<str, str> m){
     c.types.insert(v[i]);
   c.bpow = (m.find("power") == m.end()) ? 0 : str2int(m["power"]);
   c.btuf = (m.find("toughness") == m.end()) ? 0 : str2int(m["toughness"]);
-  parse_quals(c, m["text"]);
+  split_quals(c, m["text"]);
   return c;
 }
 
@@ -73,7 +71,7 @@ void parse(){
   str s;
   Card c;
 
-  fp = fopen(lpath, "r");
+  fp = fopen("lib.json", "r");
   fseek(fp, 0, SEEK_END);
   n = ftell(fp);
   fseek(fp, 0, SEEK_SET);

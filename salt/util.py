@@ -49,8 +49,8 @@ def prefix(t, d):
 def get_browser():
   opts = Options()
   opts.add_argument('--disable-bundled-ppapi-flash')
-  opts.add_extension('../Adblock-Plus_v1.12.4.crx')
-  br = Chrome(executable_path='../chromedriver', chrome_options=opts)
+  opts.add_extension('../sw/Adblock-Plus_v1.12.4.crx')
+  br = Chrome(executable_path='../sw/chromedriver.exe', chrome_options=opts)
   br.set_window_size(1536, 1024)
   return br
 

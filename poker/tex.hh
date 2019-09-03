@@ -12,14 +12,14 @@ struct betcmp {
 };
 
 struct tex {
-  int blind, p1, bet;
+  int blind, p1, bet, ID;
   bot* raiser;
   texhand board;
   deck d;
-  vec<bot*> bots;
+  vec<bot*> bots, pos, neg;
   vec<pot> pots;
 
-  tex(vec<bot*> _bots, int _blind): bots(_bots), blind(_blind), p1(0) {}
+  tex(int _blind): blind(_blind), p1(0) {}
 
   int active(){
     int i,n;
@@ -34,7 +34,7 @@ struct tex {
     n = active();
     if(n < 2) return 1;
     c = bots[i]->bet_tex(this);
-    printf("Bot %d bets %d\n", i, c);
+    if(DBG) printf("Bot %d bets %d\n", i, c);
 
     if(c == -1){
       bots[i]->out = true;
@@ -76,12 +76,6 @@ struct tex {
       i = (i == bots.size()-1) ? 0 : i+1;
     }
 
-    //!
-    printf("Bets: (%d", bots[0]->bet);
-    for(i = 1; i < bots.size(); ++i)
-      printf(", %d", bots[i]->bet);
-    printf(")\n");
-
     // Create new pots
     for(i = 0; i < bots.size(); ++i)
       if(!bots[i]->out) v.pb(i);
@@ -97,8 +91,8 @@ struct tex {
       }
       while(!v.empty() && !bots[v.back()]->bet)
         v.pop_back();
-      printf("Pot created with %d cash, %d players\n",
-             p.cash, p.players.size());
+      if(DBG) printf("Pot created with %d cash, %d players\n",
+                     p.cash, p.players.size());
       pots2.pb(p);
     }
 
@@ -118,16 +112,19 @@ struct tex {
 
   void play(){
     bool f;
-    int i,j,k,t;
+    int i,j,k,n,t;
+    texhand b;
     vec<int> winners;
 
     t = 0;
-    while(bots.size() > 1){
+    while(1){
       ++t;
-      printf("\nTURN %d:\n(%d", t, bots[0]->cash);
-      for(i = 1; i < bots.size(); ++i)
-        printf(", %d", bots[i]->cash);
-      printf(")\n");
+      if(DBG){
+        printf("\n----\nTURN %d:\n----\n\n(%d", t, bots[0]->cash);
+        for(i = 1; i < bots.size(); ++i)
+          printf(", %d", bots[i]->cash);
+        printf(")\n");
+      }
 
       // Rejoin players
       for(i = 0; i < bots.size(); ++i)
@@ -155,17 +152,17 @@ struct tex {
         d.draw();
         for(i = 0; i < 3; ++i)
           board.pb(d.draw());
-        printf("\nFLOP: %s\n", board.string().c_str());
+        if(DBG) printf("\nFLOP: %s\n\n", board.string().c_str());
         bet = 0, f = betround();
         if(!f){
           d.draw();
           board.pb(d.draw());
-          printf("\nTURN: %s\n", board.string().c_str());
+          if(DBG) printf("\nTURN: %s\n\n", board.string().c_str());
           bet = 0, f = betround();
           if(!f){
             d.draw();
             board.pb(d.draw());
-            printf("\nRIVER: %s\n\n", board.string().c_str());
+            if(DBG) printf("\nRIVER: %s\n\n", board.string().c_str());
             bet = 0, betround();
           }
         }
@@ -182,9 +179,15 @@ struct tex {
           if(f) winners.pb(pots[i].players[j]);
         }
         for(j = 0; j < winners.size(); ++j){
-          k = pots[i].cash / winners.size();
-          bots[winners[j]]->cash += k;
-          printf("Bot %d won %d\n", winners[j], k);
+          n = pots[i].cash / winners.size();
+          bots[winners[j]]->cash += n;
+          b.clear();
+          b.pb(bots[winners[j]]->hand[0]);
+          b.pb(bots[winners[j]]->hand[1]);
+          for(k = 0; k < board.size(); ++k)
+            b.pb(board[k]);
+          str s(bots[winners[j]]->string());
+          printf("%s won %d with %s\n", s.c_str(), n, b.string().c_str());
         }
       }
       pots.clear();
@@ -192,10 +195,30 @@ struct tex {
       // Remove players
       for(i = 0; i < bots.size(); ++i){
         if(!bots[i]->cash){
+          if     (bots.size() == 2) bots[i]->score += 50;
+          else if(bots.size() == 3) bots[i]->score += 25;
+          else if(bots.size() == 4) bots[i]->score += 10;
+          else if(bots.size() == 5) bots[i]->score -= 10;
+          else if(bots.size() == 6) bots[i]->score -= 20;
+          else if(bots.size() == 7) bots[i]->score -= 50;
+          else if(bots.size() == 8) bots[i]->score -= 100;
+          else if(bots.size() == 9) bots[i]->score -= 200;
+          if(bots[i]->score <= 0 && bots[i]->score > -100) neg.pb(bots[i]);
+          else if(bots[i]->score > 0) pos.pb(bots[i]);
+          printf("\nBot %d has score %d (%d pos, %d neg)\n\n",
+                 bots[i]->id, bots[i]->score, pos.size(), neg.size());
           bots.erase(bots.begin() + i);
           if(p1 >= i) p1 = (p1-1 < 0) ? bots.size()-1 : p1-1;
           i = 0;
         }
+      }
+
+      // Award winner
+      if(bots.size() == 1){
+        bots[0]->score += 100;
+        pos.pb(bots[0]);
+        bots.clear();
+        break;
       }
 
       // Rotate dealer
@@ -203,15 +226,36 @@ struct tex {
     }
   }
 
+  void sim(){
+    int i;
+    ID = 0;
+    while(1){
+      while(bots.size() < 9 && !neg.empty())
+        bots.pb(neg[0]), neg.erase(neg.begin());
+      while(bots.size() < 8 && !pos.empty())
+        bots.pb(pos[0]), pos.erase(pos.begin());
+      while(bots.size() < 9)
+        bots.pb(genbot(ID++));
+      for(i = 0; i < bots.size(); ++i)
+        bots[i]->cash = 1000;
+      play();
+
+      printf("---\n");
+      for(i = 0; i < pos.size(); ++i)
+        printf("%s: score %d\n", pos[i]->string().c_str(), pos[i]->score);
+      printf("---\n\n");
+    }
+  }
+
   // Given a 2-card hand, 0-5 card board, and number of players,
   // return chance of winning
-  float sim(texhand h, texhand b, int p){
+  float simhand(texhand h, texhand b, int p){
     int i,j,k,m,n,w,t, p1,p2,k3,st,fl,fh,k4,sf,rf;
     texhand hn,bn;
     deck d,d0;
     vec<texhand> ph;
 
-    const int ITER = 10000;
+    const int ITER = 100;
 
     d0 = DECK;
     for(i = 0; i < h.size(); ++i)
@@ -296,15 +340,13 @@ int human::bet_tex(tex* g){
 
 
 int ai::bet_tex(tex* g){
-  int mx;
-  float w = g->sim(hand, g->board, g->active());
-  if(w > 0.8f) mx = cash;
-  else if(w > 0.6f) mx = cash / 4;
-  else if(w > 0.4f) mx = cash / 10;
-  else if(w > 0.2f) mx = cash / 50;
-  else mx = 0;
-
-  if(g->bet - bet > mx) return -1;
+  int i,c,m;
+  float f,w;
+  w = g->simhand(hand, g->board, g->active());
+  for(i = 0, c = MAX*cash, f = 1.0f-1.0f/DIV, m = 0; i < DIV-1;
+      ++i, c *= SCALE, f -= 1.0f/DIV)
+    if(w > f){ m = c; break; }
+  if(g->bet - bet > m) return -1;
   if(g->raiser == this) return 0;
-  return max(g->bet - bet, mx / (6 - g->board.size()));
+  return max(g->bet - bet, m / (6 - g->board.size()));
 }

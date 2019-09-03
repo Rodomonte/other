@@ -18,6 +18,7 @@
 #define RN 13
 
 
+bool DBG = false;
 const char RANK[RN] = {'2','3','4','5','6','7','8','9','T','J','Q','K','A'},
            SUIT[SN] = {'C','D','S','H'};
 const int CN = RN * SN;
