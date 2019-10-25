@@ -6,18 +6,28 @@
 #include "obj.hh"
 
 
+umap<str, Card> card_lib;
+
+Quality parse_qual(str s){
+  Quality q;
+  //!
+  return q;
+}
+
 void split_quals(Card& c, str s){
   int i,j;
   for(i = 0, j = -1; i < s.size(); ++i)
     if(s[i] == '\n' || s[i] == '('){
-      if(i > j) c.quals.insert(s.substr(j+1, i-j-1));
+      if(i > j)
+        c.quals.pb(parse_qual(s.substr(j+1, i-j-1)));
       if(s[i] == '('){
         while(s[i] != ')') ++i;
         j = i+1;
       }
       else j = i;
     }
-  if(j < (int)s.size()-1) c.quals.insert(s.substr(j+1, s.size()-j-1));
+  if(j < (int)s.size()-1)
+    c.quals.pb(parse_qual(s.substr(j+1, s.size()-j-1)));
 }
 
 Card fill(umap<str, str> m){

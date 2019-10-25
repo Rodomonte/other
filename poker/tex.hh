@@ -343,10 +343,18 @@ int ai::bet_tex(tex* g){
   int i,c,m;
   float f,w;
   w = g->simhand(hand, g->board, g->active());
+  if(w > MAX) return cash;
   for(i = 0, c = MAX*cash, f = 1.0f-1.0f/DIV, m = 0; i < DIV-1;
       ++i, c *= SCALE, f -= 1.0f/DIV)
     if(w > f){ m = c; break; }
   if(g->bet - bet > m) return -1;
   if(g->raiser == this) return 0;
-  return max(g->bet - bet, m / (6 - g->board.size()));
+  m = max(g->bet - bet, m / (6 - g->board.size()));
+
+  texhand b;
+  b.pb(hand[0]), b.pb(hand[1]);
+  for(i = 0; i < g->board.size(); ++i)
+    b.pb(g->board[i]);
+  //printf("%s bet %d with %s\n", string().c_str(), m, b.string().c_str());
+  return m;
 }

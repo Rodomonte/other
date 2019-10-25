@@ -6,10 +6,49 @@
 #include "util.hh"
 
 
+enum ActionType {
+  DRAW
+, CAST
+, ATTACK
+, BLOCK
+};
+
+enum Subject {
+  YOU
+, ANY_PLAYER
+, ANY_CREATURE
+}
+
+enum Object {
+  NONE
+, YOU
+, X_TARGET_PLAYERS
+, X_TARGET_CREATURES
+, X_TARGET_CREATURES_OR_PLANESWALKERS
+};
+
+struct Action {
+  int subject_x, object_x;
+  ActionType action;
+  Subject subject;
+  Object object;
+  uset<Condition> conditions;
+};
+
+struct Sleeve;
+
+struct Quality {
+  Action trigger;
+  vec<Action> actions;
+  Sleeve* owner;
+};
+
+
 struct Card {
   int            bpow, btuf;
   str            name;
-  uset<str>      types, quals;
+  vec<Quality>   quals;
+  uset<str>      types;
   umap<str, int> cost;
 
   Card(){}
@@ -43,12 +82,7 @@ struct Card {
       while(buf[i] != ' ') ++i;
     }
 
-    for(jt = QUALS.begin(); jt != QUALS.end(); ++jt)
-      if(quals.find(*jt) != quals.end()){
-        sprintf(buf+i+1, "- %s -", jt->c_str());
-        i += 3;
-        while(buf[i] != '-') ++i;
-      }
+    //! quals
     return str(buf);
   }
 
@@ -60,29 +94,11 @@ struct Card {
     return n;
   }
 
-  int pow(Game& g){
-    int n;
-    umap<str, int>::iterator it;
-    for(it = counters.begin(), n = bpow; it != counters.end(); ++it){
-      //!
-    }
-    return n;
-  }
-
-  int tuf(Game& g){
-    int n;
-    umap<str, int>::iterator it;
-    for(it = counters.begin(), n = btuf; it != counters.end(); ++it){
-      //!
-    }
-    return n;
-  }
-
   bool perm(){
-    return in(TYPES[ART], types) || in(TYPES[CRE], types) ||
-           in(TYPES[ENC], types) || in(TYPES[LAN], types);
+    return in("Artifact", types) || in("Creature", types) ||
+           in("Enchantment", types) || in("Land", types);
   }
-  bool nlperm(){ return perm() && !in(TYPES[LAN], types); }
+  bool nlperm(){ return perm() && !in("Land", types); }
 };
 
 
@@ -92,16 +108,6 @@ struct Sleeve {
   umap<str, int> counter;
 
   Sleeve(Card& c): card(c), tapped(false), attacking(false) {}
-};
-
-
-Trigger
-
-
-struct Quality {
-  Trigger trigger;
-  Action action;
-  Sleeve* owner;
 };
 
 
@@ -137,6 +143,23 @@ struct Deck {
            str("\n");
     return s;
   }
+};
+
+
+struct Game;
+
+struct Bot {
+  int life;
+  Deck deck;
+  vec<Sleeve> library, hand, field, grave, exile;
+
+  Bot(Deck& d): deck(d) {}
+
+  virtual void main1(Game& g) = 0;
+  virtual void attack(Game& g) = 0;
+  virtual void block(Game& g) = 0;
+  virtual void main2(Game& g) = 0;
+  virtual void respond(Game& g, Card& c) = 0;
 };
 
 

@@ -1,11 +1,7 @@
 // MAIN
 
 #include "parse.hh"
-#include "sim.hh"
-
-
-umap<str, Card> card_lib;
-vec<Deck> deck_lib;
+#include "game.hh"
 
 
 void update_lib(){
@@ -140,7 +136,7 @@ int main(){
       case 4: create_card(); break;
       case 5: create_deck(); break;
       case 6: Game().play(); break;
-      case 7: Sim().sim();   break;
+      case 7: Game().sim();  break;
     }
 
   }

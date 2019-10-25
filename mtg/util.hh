@@ -19,7 +19,14 @@ void call(const char* cmd){
   exit(0);
 }
 
-bool in(str& s, uset<str>& u){
+template <typename T>
+vec<T> operator+(const vec<T>& a, const vec<T>& b){
+  vec<T> v(a);
+  v.insert(v.end(), b.begin(), b.end());
+  return v;
+}
+
+bool in(str s, uset<str>& u){
   return u.find(s) != u.end();
 }
 
@@ -29,13 +36,6 @@ str replace(str s, str t, str n){
     s = s.substr(0, i) + n + s.substr(i+t.size(), s.size()-i-t.size());
   return s;
 }
-
-// template <typename T>
-// vec<T> operator+(const vec<T>& a, const vec<T>& b){
-//   vec<T> v(a);
-//   v.insert(v.end(), b.begin(), b.end());
-//   return v;
-// }
 
 bool isnum(str s){
   int i,d;
