@@ -4,6 +4,7 @@ from math import sqrt
 from os import chdir   \
              , listdir
 
+datadir = 'data/future2'
 
 def find(txt, i0, tok):
   for i in range(i0, len(txt)):
@@ -27,11 +28,13 @@ def cross(a, b):
 def pldist(a, b, c): # distance from a to line(b, c)
   return vlen(cross(vsub(a, b), vsub(a, c))) / vlen(vsub(b, c))
 
+# please comment what 1.05 is for
 def side(a, b):
   return vlen(a) + vlen(b) > 1.05 * vlen(vsub(a, b))
 
 months = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, \
           'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
+
 def datelt(a, b):
   toka, tokb = a.split('-'), b.split('-')
   if int(toka[0]) < int(tokb[0]): return True
@@ -44,11 +47,10 @@ def datelt(a, b):
   if int(toka[3]) > int(tokb[3]): return False
   return False
 
-
 # PARSE
 
 mb = []
-chdir('data')
+chdir(datadir)
 files = listdir('.')
 n = 0
 for fname in files:
@@ -85,10 +87,9 @@ for fname in files:
   n += 1
   print(n, 'of', len(files), 'parsed.')
 
-
 # COLINEARITY
 
-ERR = 20000000 #0.05
+ERR = 0.05 #20000000
 ERRM = 0.01
 TOP = 2000
 
