@@ -4,6 +4,7 @@ from time import sleep, time
 from os import mkdir
 from os.path import exists
 from selenium.webdriver import Chrome
+from selenium.webdriver.chrome.options import Options
 
 url = 'https://www.baseball-reference.com/teams'
 aliases = {'LAA' : 'ANA' \
@@ -13,7 +14,9 @@ start_year = 1970
 
 def gethtml(u):
   while True:
-    br = Chrome(executable_path='../sw/chromedriver.exe')
+    opt = Options()
+    opt.add_argument('--headless')
+    br = Chrome(executable_path='../sw/chromedriver.exe', chrome_options=opt)
     br.set_page_load_timeout(10)
     html = ''
     try: br.get(u)
@@ -75,25 +78,15 @@ def pull_teams():
   html = gethtml(url)
   html = find(html, 'href="/teams')[1][11:]
   html = find(html, 'teams')[1][5:]
-
-  while find(html, 'leagues')[0] > find(html, 'teams')[0]:
-    teams += [html[1:4]]
-    if not exists('data/'+teams[-1]): mkdir('data/'+teams[-1])
-    html = find(html, 'teams')[1][5:]
-    html = find(html, 'teams')[1][5:]
   html = find(html, 'year_min')[1][8:]
 
   r = []
-  for i in range(len(teams)):
+  while True:
+    if find(html, 'Earlier Franchises')[0] < find(html, 'tr data-row')[0]: break
     html = find(html, 'tr data-row')[1]
-    m = len(html)
-    team = ''
-    for t in teams:
-      n = find(html[:1000], aliases[t] if t in aliases else t)[0]
-      if n != -1 and n < m:
-        m = n
-        team = t
-
+    html = find(html, 'teams')[1]
+    team = html[6:9]
+    if not exists('data/'+team): mkdir('data/'+team)
     html = find(html, 'year_min')[1][8:]
     start = int(find_digit(html)[1][:4])
     html = find(html, 'year_max')[1][8:]
